@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#7c6ef7">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>Momentum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a10;--s1:#13131c;--s2:#1a1a26;--s3:#222230;--s4:#2a2a3a;
+  --b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.1);
+  --a:#7c6ef7;--a2:#e86af3;--a3:#3ff5c0;--ag:linear-gradient(135deg,#7c6ef7,#e86af3);
+  --t:#eeeef5;--t2:#8a8aa8;--t3:#52526a;--t4:#35354a;
+  --red:#f56060;--yel:#f5ae50;--blu:#50c5f5;--grn:#3ff5c0;
+  --r:14px;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+  --hdr:calc(var(--st) + 52px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+input,textarea,select,.content{-webkit-user-select:text!important;user-select:text!important;}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;}
+#app{display:flex;flex-direction:column;height:100%;height:100dvh;max-width:500px;margin:0 auto;position:relative;overflow:hidden;}
+.glow{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(120px);opacity:.07;}
+.g1{width:320px;height:320px;background:#7c6ef7;top:-120px;right:-80px;}
+.g2{width:240px;height:240px;background:#e86af3;bottom:60px;left:-80px;}
+.g3{width:180px;height:180px;background:#3ff5c0;top:40%;left:50%;transform:translate(-50%,-50%);}
+#app>*{position:relative;z-index:1;}
+.topbar{height:var(--hdr);display:flex;align-items:flex-end;padding:0 16px 10px;justify-content:space-between;flex-shrink:0;background:linear-gradient(to bottom,var(--bg) 60%,transparent);}
+.app-name{font-family:'Syne',sans-serif;font-size:23px;font-weight:800;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;letter-spacing:-.3px;}
+.app-date{font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:1.2px;margin-top:2px;}
+.topbar-right{display:flex;gap:5px;align-items:center;}
+.icon-btn{width:34px;height:34px;border-radius:50%;background:var(--s2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;}
+.icon-btn:active{background:var(--s3);transform:scale(.9);}
+.xp-badge{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:12px;background:rgba(63,245,192,.1);border:1px solid rgba(63,245,192,.2);cursor:pointer;}
+.xp-lv{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--grn);}
+.xp-bar-wrap{width:32px;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.xp-bar{height:4px;border-radius:2px;background:var(--grn);transition:width .5s ease;}
+.tabbar{display:flex;gap:3px;padding:0 16px 6px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.tabbar::-webkit-scrollbar{display:none;}
+.tab-btn{padding:7px 13px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;color:var(--t3);background:transparent;border:none;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all .2s;flex-shrink:0;min-height:32px;display:flex;align-items:center;gap:4px;}
+.tab-btn.active{background:var(--a);color:#fff;font-weight:600;}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scrollbar-width:none;}
+.content::-webkit-scrollbar{display:none;}
+.inputbar{padding:8px 16px;padding-bottom:calc(8px + var(--sb));background:var(--bg);border-top:1px solid var(--b);flex-shrink:0;}
+.input-row{display:flex;gap:8px;}
+.quick-input{flex:1;background:var(--s1);border:1.5px solid var(--b2);border-radius:12px;padding:11px 14px;font-size:14px;color:var(--t);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;transition:border-color .2s;}
+.quick-input:focus{border-color:var(--a);}
+.quick-input::placeholder{color:var(--t3);}
+.add-fab{width:44px;height:44px;border-radius:12px;background:var(--ag);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 16px rgba(124,110,247,.4);}
+.add-fab:active{transform:scale(.88);}
+.navbar{display:flex;padding:6px 8px;padding-bottom:calc(6px + var(--sb));background:var(--s1);border-top:1px solid var(--b);flex-shrink:0;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 0;border-radius:10px;min-height:50px;justify-content:center;transition:background .15s;}
+.nav-btn:active{background:var(--s2);}
+.nav-icon{font-size:18px;line-height:1;transition:transform .2s;}
+.nav-lbl{font-size:9px;font-weight:500;color:var(--t3);transition:color .2s;}
+.nav-btn.active .nav-lbl{color:var(--a);}
+.nav-btn.active .nav-icon{transform:scale(1.15);}
+.sec-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin:16px 0 8px;display:flex;align-items:center;gap:6px;}
+.sec-count{background:var(--s3);padding:2px 7px;border-radius:8px;font-size:9px;}
+.stat-row{display:flex;gap:7px;margin-bottom:8px;}
+.stat-card{flex:1;background:var(--s1);border-radius:var(--r);padding:13px 11px;border:1px solid var(--b);}
+.stat-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.stat-lbl{font-size:10px;color:var(--t3);margin-top:1px;}
+.prog-card{background:var(--s1);border-radius:var(--r);padding:13px;margin-bottom:8px;border:1px solid var(--b);}
+.prog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px;}
+.prog-head span:last-child{font-weight:600;color:var(--a);}
+.prog-bg{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.prog-fill{height:5px;border-radius:3px;background:var(--ag);transition:width .6s cubic-bezier(.4,0,.2,1);}
+.xp-card{background:linear-gradient(135deg,rgba(63,245,192,.1),rgba(124,110,247,.08));border-radius:var(--r);padding:13px;margin-bottom:10px;border:1px solid rgba(63,245,192,.2);}
+.xp-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.xp-level-big{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--grn);}
+.xp-pts{font-size:10px;color:var(--t3);}
+.xp-full-bar{height:6px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.xp-full-fill{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--a3),var(--a));transition:width .6s ease;}
+.xp-next{font-size:10px;color:var(--t3);margin-top:4px;}
+.ai-card{background:linear-gradient(135deg,rgba(124,110,247,.1),rgba(232,106,243,.07));border-radius:var(--r);padding:13px;margin-bottom:10px;border:1px solid rgba(124,110,247,.2);position:relative;overflow:hidden;}
+.ai-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:var(--a);filter:blur(50px);opacity:.15;pointer-events:none;}
+.ai-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.ai-ava{width:28px;height:28px;border-radius:50%;background:var(--ag);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ai-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
+.ai-sub{font-size:9px;color:var(--a);text-transform:uppercase;letter-spacing:.8px;}
+.ai-badge{margin-left:auto;padding:2px 8px;border-radius:8px;font-size:9px;font-weight:600;background:rgba(63,245,192,.15);color:var(--grn);border:1px solid rgba(63,245,192,.2);}
+.ai-row{display:flex;gap:6px;}
+.ai-in{flex:1;background:var(--s1);border:1.5px solid var(--b);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--t);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;}
+.ai-in:focus{border-color:var(--a);}
+.ai-in::placeholder{color:var(--t3);font-size:12px;}
+.ai-go{padding:0 13px;height:38px;border-radius:10px;background:var(--ag);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0;}
+.ai-go:active{transform:scale(.92);}
+.ai-go:disabled{opacity:.5;}
+.ai-ans{margin-top:10px;padding:10px;background:var(--s1);border-radius:8px;font-size:12px;color:var(--t2);line-height:1.65;display:none;max-height:180px;overflow-y:auto;border:1px solid var(--b);}
+.ai-ans.open{display:block;animation:fup .3s ease;}
+.ai-thinking{display:flex;align-items:center;gap:6px;color:var(--t3);font-size:11px;}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--a);animation:bounce 1.2s infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s;}.ai-dot:nth-child(3){animation-delay:.4s;}
+.search-row{display:flex;gap:7px;margin-bottom:8px;}
+.search-wrap{flex:1;position:relative;}
+.search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;}
+.search-in{width:100%;background:var(--s1);border:1.5px solid var(--b);border-radius:10px;padding:9px 12px 9px 32px;font-size:13px;color:var(--t);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;}
+.search-in:focus{border-color:var(--a);}
+.search-in::placeholder{color:var(--t3);font-size:12px;}
+.search-x{width:34px;height:34px;border-radius:50%;background:var(--s2);border:1px solid var(--b);display:none;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--t3);flex-shrink:0;align-self:center;}
+.search-x.show{display:flex;}
+.chips{display:flex;gap:5px;padding:0 0 8px;overflow-x:auto;scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:5px 11px;border-radius:14px;font-size:11px;font-weight:500;cursor:pointer;background:var(--s2);color:var(--t2);border:1px solid var(--b);white-space:nowrap;font-family:'DM Sans',sans-serif;min-height:30px;display:flex;align-items:center;transition:all .15s;flex-shrink:0;}
+.chip.active{background:var(--a);color:#fff;border-color:var(--a);}
+.chip:active{transform:scale(.93);}
+.sort-row{display:flex;justify-content:flex-end;margin-bottom:6px;}
+.sort-btn{padding:4px 10px;border-radius:8px;background:transparent;border:1px solid var(--b);color:var(--t3);font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;}
+.sort-btn:active{background:var(--s2);}
+.task{display:flex;align-items:flex-start;gap:9px;padding:11px 12px;background:var(--s1);border-radius:var(--r);margin-bottom:5px;border:1px solid var(--b);position:relative;overflow:hidden;touch-action:pan-y;}
+.task::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px;}
+.task.p1::before{background:var(--red);}.task.p2::before{background:var(--yel);}
+.task.p3::before{background:var(--grn);}.task.p4::before{background:var(--blu);}
+.task.done{opacity:.35;}.task.done .task-text{text-decoration:line-through;}
+.task.overdue:not(.done) .task-text{color:var(--red);}
+.task-del-bg{position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:18px;border-radius:0 var(--r) var(--r) 0;opacity:0;}
+.task-inner{display:flex;align-items:flex-start;gap:9px;flex:1;transition:transform .2s cubic-bezier(.4,0,.2,1);width:100%;}
+.task-chk{width:21px;height:21px;min-width:21px;border-radius:50%;border:2px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;margin-top:1px;flex-shrink:0;}
+.task-chk.on{background:var(--a);border-color:var(--a);}
+.task-chk.on::after{content:'✓';font-size:10px;color:#fff;font-weight:700;}
+.task-body{flex:1;min-width:0;cursor:pointer;}
+.task-text{font-size:13px;line-height:1.4;color:var(--t);}
+.task-meta{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;align-items:center;}
+.tag{padding:2px 6px;border-radius:8px;font-size:9px;font-weight:600;}
+.tg-pur{background:rgba(124,110,247,.18);color:var(--a);}
+.tg-grn{background:rgba(63,245,192,.14);color:var(--grn);}
+.tg-pnk{background:rgba(232,106,243,.14);color:var(--a2);}
+.tg-red{background:rgba(245,96,96,.14);color:var(--red);}
+.tg-blu{background:rgba(80,197,245,.14);color:var(--blu);}
+.tg-yel{background:rgba(245,174,80,.14);color:var(--yel);}
+.task-inf{font-size:9px;color:var(--t3);}
+.repeat-badge{font-size:9px;color:var(--a2);background:rgba(232,106,243,.12);padding:1px 5px;border-radius:5px;}
+.task-acts{display:flex;gap:2px;flex-shrink:0;}
+.task-act{width:28px;height:28px;border-radius:8px;background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.task-act:active{background:var(--s3);color:var(--t);}
+.subtasks-wrap{margin-top:6px;margin-left:4px;padding-left:8px;border-left:2px solid var(--s3);}
+.subtask-item{display:flex;align-items:center;gap:6px;padding:3px 0;}
+.mini-chk{width:15px;height:15px;min-width:15px;border-radius:50%;border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.mini-chk.on{background:var(--grn);border-color:var(--grn);}
+.mini-chk.on::after{content:'✓';font-size:7px;color:#000;font-weight:800;}
+.subtask-text{font-size:11px;color:var(--t2);line-height:1.3;}
+.subtask-text.done{text-decoration:line-through;opacity:.5;}
+.quick-actions{position:fixed;z-index:200;background:var(--s1);border-radius:14px;padding:6px;border:1px solid var(--b2);box-shadow:0 16px 48px rgba(0,0,0,.6);min-width:180px;animation:fup .15s ease;}
+.qa-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:13px;transition:background .12s;}
+.qa-item:active{background:var(--s2);}
+.qa-icon{font-size:16px;width:22px;text-align:center;}
+.qa-sep{height:1px;background:var(--b);margin:3px 0;}
+.habit{background:var(--s1);border-radius:var(--r);padding:12px;margin-bottom:6px;border:1px solid var(--b);position:relative;}
+.habit-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.habit-name{font-size:13px;font-weight:500;}
+.habit-streak{font-size:11px;color:var(--a);font-weight:600;}
+.habit-days{display:flex;gap:3px;}
+.hday{flex:1;aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:all .15s;background:var(--s2);}
+.hday:active{transform:scale(.85);}
+.hday-l{font-size:7px;color:var(--t3);text-transform:uppercase;font-weight:600;}
+.hday-v{font-size:9px;font-weight:700;color:var(--t3);}
+.hday.on{background:var(--a);}
+.hday.on .hday-l,.hday.on .hday-v{color:rgba(255,255,255,.85);}
+.hday.today{border:2px solid var(--a);background:rgba(124,110,247,.12);}
+.habit-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:4px;opacity:.4;}
+.pom-card{background:var(--s1);border-radius:var(--r);padding:22px 16px;border:1px solid var(--b);display:flex;flex-direction:column;align-items:center;gap:12px;}
+.pom-ring{position:relative;width:150px;height:150px;}
+.pom-svg{transform:rotate(-90deg);}
+.pom-bg{fill:none;stroke:var(--s3);stroke-width:6;}
+.pom-pr{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1),stroke .4s;}
+.pom-t{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Syne',sans-serif;font-size:30px;font-weight:700;}
+.pom-lbl{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;}
+.pom-dots{display:flex;gap:5px;}
+.pom-dot{width:7px;height:7px;border-radius:50%;background:var(--s3);transition:background .3s;}
+.pom-dot.on{background:var(--a);}
+.pom-btns{display:flex;gap:8px;}
+.pom-btn{padding:10px 18px;border-radius:20px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:42px;transition:transform .15s;}
+.pom-btn:active{transform:scale(.92);}
+.pom-btn.pri{background:var(--a);color:#fff;box-shadow:0 3px 12px rgba(124,110,247,.35);}
+.pom-btn.sec{background:var(--s2);color:var(--t2);}
+.pom-task-sel{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--t);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:60px;padding:0 2px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar{width:100%;border-radius:4px 4px 0 0;background:var(--a);opacity:.6;transition:height .5s ease;}
+.bar.today{opacity:1;background:linear-gradient(to top,var(--a),var(--a2));}
+.bar-lbl{font-size:8px;color:var(--t3);text-transform:uppercase;}
+.bar-val{font-size:8px;color:var(--t2);font-weight:600;}
+.note{background:var(--s1);border-radius:var(--r);padding:12px;margin-bottom:6px;border:1px solid var(--b);position:relative;cursor:pointer;transition:transform .15s;}
+.note:active{transform:scale(.985);}
+.note-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.note-body{font-size:11px;color:var(--t3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.note-date{font-size:9px;color:var(--t4);margin-top:5px;}
+.note-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:4px;opacity:.4;}
+.proj{background:var(--s1);border-radius:var(--r);padding:13px;margin-bottom:6px;border:1px solid var(--b);cursor:pointer;transition:transform .15s;}
+.proj:active{transform:scale(.985);}
+.proj-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.proj-desc{font-size:11px;color:var(--t3);}
+.proj-meta{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.proj-bar-bg{flex:1;height:3px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.proj-bar-fill{height:3px;border-radius:2px;transition:width .5s ease;}
+.kanban{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.kanban::-webkit-scrollbar{display:none;}
+.k-col{min-width:115px;flex:1;background:var(--s1);border-radius:var(--r);padding:9px;border:1px solid var(--b);transition:border-color .2s,background .2s;}
+.k-col.drag-over{border-color:var(--a);background:rgba(124,110,247,.06);}
+.k-head{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;}
+.k-cnt{background:var(--s3);padding:1px 6px;border-radius:5px;font-size:9px;}
+.k-card{background:var(--s2);border-radius:8px;padding:8px 9px;margin-bottom:4px;font-size:11px;line-height:1.4;cursor:pointer;border:1px solid var(--b);display:flex;align-items:flex-start;gap:5px;}
+.k-dot{width:6px;height:6px;min-width:6px;border-radius:50%;margin-top:3px;}
+.k-add{width:100%;padding:6px;background:transparent;border:1px dashed var(--b2);border-radius:7px;color:var(--t3);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.k-add:active{border-color:var(--a);color:var(--a);}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.cal-nav-btn{width:32px;height:32px;border-radius:50%;background:var(--s2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--t2);}
+.cal-nav-btn:active{background:var(--s3);}
+.cal-month-lbl{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--s1);border-radius:var(--r);padding:10px;border:1px solid var(--b);}
+.cal-dh{text-align:center;font-size:9px;color:var(--t3);font-weight:600;padding:2px 0;}
+.cal-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:11px;cursor:pointer;position:relative;transition:background .12s;}
+.cal-d:active{background:var(--s3);}
+.cal-d.today{background:var(--a);color:#fff;font-weight:700;}
+.cal-d.selected{background:rgba(124,110,247,.25);border:1px solid var(--a);}
+.cal-d.has-task::after{content:'';position:absolute;bottom:2px;width:4px;height:4px;border-radius:50%;background:var(--a);}
+.cal-d.today::after{display:none;}
+.cal-d.empty{pointer-events:none;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;backdrop-filter:blur(4px);}
+.overlay.open{opacity:1;pointer-events:all;}
+.sheet{background:var(--s1);border-radius:22px 22px 0 0;padding:16px 16px calc(16px + var(--sb));width:100%;max-width:500px;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:93vh;overflow-y:auto;scrollbar-width:none;}
+.sheet::-webkit-scrollbar{display:none;}
+.overlay.open .sheet{transform:translateY(0);}
+.sheet-handle{width:38px;height:4px;background:var(--s3);border-radius:2px;margin:0 auto 14px;}
+.sheet-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px;}
+.field-lbl{font-size:10px;color:var(--t3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.field{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:9px;padding:11px 12px;font-size:14px;color:var(--t);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;transition:border-color .2s;margin-bottom:11px;}
+.field:focus{border-color:var(--a);}
+.field::placeholder{color:var(--t3);}
+textarea.field{resize:none;min-height:68px;}
+.p-row{display:flex;gap:5px;margin-bottom:11px;}
+.p-btn{flex:1;padding:8px 3px;border-radius:8px;border:2px solid var(--b);font-size:10px;font-weight:600;cursor:pointer;background:var(--s2);color:var(--t2);font-family:'DM Sans',sans-serif;text-align:center;transition:all .15s;min-height:38px;}
+.p-btn:active{transform:scale(.92);}
+.p-btn.p1.sel{border-color:var(--red);background:rgba(245,96,96,.12);color:var(--red);}
+.p-btn.p2.sel{border-color:var(--yel);background:rgba(245,174,80,.12);color:var(--yel);}
+.p-btn.p3.sel{border-color:var(--grn);background:rgba(63,245,192,.1);color:var(--grn);}
+.p-btn.p4.sel{border-color:var(--blu);background:rgba(80,197,245,.1);color:var(--blu);}
+.save-btn{width:100%;padding:13px;background:var(--ag);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;min-height:48px;box-shadow:0 4px 16px rgba(124,110,247,.3);}
+.save-btn:active{transform:scale(.97);}
+.del-btn{width:100%;padding:11px;background:transparent;border:1.5px solid var(--red);border-radius:12px;color:var(--red);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif;min-height:44px;}
+.del-btn:active{background:rgba(245,96,96,.1);}
+.sub-row{display:flex;gap:6px;margin-bottom:8px;}
+.sub-in{flex:1;background:var(--s2);border:1.5px solid var(--b);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--t);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;}
+.sub-in:focus{border-color:var(--grn);}
+.sub-add{padding:0 12px;height:36px;border-radius:8px;background:rgba(63,245,192,.15);border:1px solid rgba(63,245,192,.3);color:var(--grn);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.sub-list{margin-bottom:10px;}
+.sub-list-item{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--b);}
+.sub-list-item:last-child{border:none;}
+.sub-item-text{flex:1;font-size:12px;color:var(--t2);}
+.sub-rm{background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 4px;}
+.confirm-btns{display:flex;gap:8px;margin-top:4px;}
+.conf-btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;min-height:48px;}
+.conf-btn:active{transform:scale(.95);}
+.conf-ok{background:var(--red);color:#fff;}
+.conf-no{background:var(--s2);color:var(--t2);}
+.toast{position:fixed;bottom:calc(76px + var(--sb));left:50%;transform:translateX(-50%) translateY(16px);background:var(--s2);border:1px solid var(--b2);border-radius:12px;padding:10px 16px;color:var(--t);font-size:12px;z-index:300;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:var(--grn);}
+.toast.err{border-color:var(--red);}
+.toast-undo{margin-left:10px;color:var(--a3);font-weight:700;cursor:pointer;pointer-events:all;text-decoration:underline;}
+.lvl-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);background:var(--s1);border:2px solid var(--grn);border-radius:20px;padding:22px 28px;text-align:center;z-index:400;opacity:0;transition:all .35s;pointer-events:none;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.lvl-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+.lvl-toast-ic{font-size:36px;margin-bottom:8px;}
+.lvl-toast-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.lvl-toast-sub{font-size:12px;color:var(--t3);margin-top:4px;}
+.gsearch-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin:10px 0 5px;}
+.gsearch-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s1);border-radius:10px;margin-bottom:4px;border:1px solid var(--b);cursor:pointer;}
+.gsearch-item:active{background:var(--s2);}
+.gsearch-icon{font-size:16px;flex-shrink:0;}
+.gsearch-text{font-size:13px;}
+.gsearch-sub{font-size:10px;color:var(--t3);margin-top:1px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--b);}
+.setting-row:last-child{border:none;}
+.setting-name{font-size:13px;font-weight:500;}
+.setting-desc{font-size:10px;color:var(--t3);margin-top:1px;}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--s3);position:relative;cursor:pointer;transition:background .25s;flex-shrink:0;border:none;}
+.toggle.on{background:var(--a);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.toggle.on::after{transform:translateX(20px);}
+.mem-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--s2);border-radius:8px;margin-bottom:8px;}
+.mem-fill-bg{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.mem-fill{height:4px;border-radius:2px;transition:width .5s;}
+.mem-txt{font-size:10px;color:var(--t3);flex-shrink:0;}
+.archive-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s1);border-radius:10px;margin-bottom:4px;border:1px solid var(--b);opacity:.6;}
+.archive-restore{background:none;border:1px solid var(--b2);border-radius:7px;padding:4px 8px;color:var(--t3);font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;}
+.dashed-btn{width:100%;padding:12px;background:transparent;border:2px dashed var(--b2);border-radius:var(--r);color:var(--t3);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;min-height:44px;transition:all .15s;margin-top:4px;}
+.dashed-btn:active{border-color:var(--a);color:var(--a);}
+.back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--a);cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif;padding:4px 0;margin-bottom:10px;font-weight:500;}
+.back-btn:active{opacity:.6;}
+.empty{text-align:center;padding:40px 16px;}
+.empty-ic{font-size:40px;opacity:.25;margin-bottom:10px;}
+.empty-tx{color:var(--t3);font-size:13px;line-height:1.5;}
+.empty-act{margin-top:14px;padding:10px 20px;background:var(--a);border:none;border-radius:20px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.matrix{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mx-cell{background:var(--s1);border-radius:var(--r);padding:10px;border:1px solid var(--b);min-height:120px;}
+.mx-cell.q1{border-top:3px solid var(--red);}
+.mx-cell.q2{border-top:3px solid var(--grn);}
+.mx-cell.q3{border-top:3px solid var(--yel);}
+.mx-cell.q4{border-top:3px solid var(--t3);}
+.mx-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:4px;}
+.mx-title.q1{color:var(--red);}.mx-title.q2{color:var(--grn);}.mx-title.q3{color:var(--yel);}.mx-title.q4{color:var(--t3);}
+.mx-task{font-size:11px;padding:6px 8px;background:var(--s2);border-radius:7px;margin-bottom:4px;line-height:1.3;cursor:pointer;border:1px solid var(--b);}
+.mx-task:active{background:var(--s3);}
+.mx-task.done{opacity:.4;text-decoration:line-through;}
+.mx-empty{font-size:10px;color:var(--t4);text-align:center;padding:12px 4px;}
+.mx-hint{font-size:10px;color:var(--t3);text-align:center;margin:8px 0 12px;line-height:1.5;}
+.mood-card{background:var(--s1);border-radius:var(--r);padding:14px;margin-bottom:10px;border:1px solid var(--b);}
+.mood-q{font-size:12px;font-weight:500;margin-bottom:10px;}
+.mood-row{display:flex;gap:6px;justify-content:space-between;}
+.mood-btn{flex:1;aspect-ratio:1;border-radius:10px;background:var(--s2);border:2px solid transparent;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.mood-btn:active{transform:scale(.88);}
+.mood-btn.sel{border-color:var(--a);background:rgba(124,110,247,.15);}
+.mood-done{text-align:center;font-size:12px;color:var(--t3);padding:6px;}
+
+.more-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.more-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;background:var(--s2);border-radius:var(--r);cursor:pointer;font-size:11px;font-weight:500;border:1px solid var(--b);transition:background .15s;}
+.more-item:active{background:var(--s3);transform:scale(.95);}
+.more-ic{font-size:24px;}
+.streak-badge{display:flex;align-items:center;gap:2px;padding:4px 8px;border-radius:12px;background:rgba(245,174,80,.12);border:1px solid rgba(245,174,80,.25);font-size:12px;font-weight:700;color:var(--yel);cursor:pointer;}
+.achievements-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;}
+.ach-card{background:var(--s1);border-radius:var(--r);padding:11px 6px;border:1px solid var(--b);text-align:center;}
+.ach-card.unlocked{border-color:var(--grn);background:rgba(63,245,192,.05);}
+.ach-card.locked{opacity:.4;filter:grayscale(1);}
+.ach-ic{font-size:26px;margin-bottom:3px;}
+.ach-name{font-size:9px;font-weight:600;color:var(--t2);line-height:1.2;}
+.ach-date{font-size:8px;color:var(--t3);margin-top:2px;}
+.heatmap-wrap{background:var(--s1);border-radius:var(--r);padding:10px;border:1px solid var(--b);margin-bottom:8px;overflow-x:auto;}
+.heatmap-grid{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;gap:2px;min-width:max-content;}
+.heatmap-cell{width:9px;height:9px;border-radius:2px;}
+.heat-lbl{font-size:9px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px;justify-content:flex-end;}
+.pie-wrap{display:flex;gap:10px;background:var(--s1);border-radius:var(--r);padding:14px;border:1px solid var(--b);margin-bottom:8px;align-items:center;}
+.pie-svg{flex-shrink:0;}
+.pie-legend{flex:1;display:flex;flex-direction:column;gap:5px;}
+.pie-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;}
+.pie-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.pie-leg-val{margin-left:auto;color:var(--t3);font-size:10px;}
+.mgrid-wrap{background:var(--s1);border-radius:var(--r);padding:10px;border:1px solid var(--b);margin-bottom:6px;overflow-x:auto;}
+.mgrid-name{font-size:12px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.mgrid-days{display:grid;grid-auto-flow:column;grid-template-rows:1fr;gap:2px;min-width:max-content;}
+.mgrid-cell{width:13px;height:13px;border-radius:3px;background:var(--s3);cursor:pointer;font-size:7px;display:flex;align-items:center;justify-content:center;color:var(--t4);}
+.mgrid-cell.on{background:var(--a);color:#fff;}
+.mgrid-cell.today{outline:2px solid var(--a2);}
+.goal-card{background:var(--s1);border-radius:var(--r);padding:12px;margin-bottom:6px;border:1px solid var(--b);border-left:3px solid var(--a);}
+.goal-sphere{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--a);margin-bottom:4px;}
+.goal-text{font-size:13px;line-height:1.4;}
+.goal-prog{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.goal-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;opacity:.5;float:right;}
+.refl-card{background:var(--s1);border-radius:var(--r);padding:14px;margin-bottom:8px;border:1px solid var(--b);}
+.refl-q{font-size:12px;font-weight:600;margin:10px 0 5px;display:flex;align-items:center;gap:5px;}
+.refl-q:first-child{margin-top:0;}
+.refl-in{width:100%;background:var(--s2);border:1.5px solid var(--b);border-radius:9px;padding:9px 11px;font-size:13px;color:var(--t);font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;resize:none;min-height:50px;}
+.refl-in:focus{border-color:var(--a);}
+.refl-done{text-align:center;font-size:12px;color:var(--grn);padding:8px;}
+.sphere-pick{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px;}
+.sphere-btn{padding:6px 11px;border-radius:14px;font-size:11px;cursor:pointer;background:var(--s2);color:var(--t2);border:1.5px solid var(--b);font-family:'DM Sans',sans-serif;}
+.sphere-btn.sel{background:var(--a);color:#fff;border-color:var(--a);}
+body.light{--bg:#f3f3f8;--s1:#fff;--s2:#ebebf3;--s3:#dcdce8;--s4:#cacacf;--b:rgba(0,0,0,.06);--b2:rgba(0,0,0,.1);--t:#18182a;--t2:#50507a;--t3:#8080a0;--t4:#aaaabc;}
+body.light .g1,body.light .g2,body.light .g3{opacity:.04;}
+
+.onb-overlay{position:fixed;inset:0;background:rgba(10,10,16,.96);z-index:600;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);}
+.onb-overlay.show{display:flex;}
+.onb-card{background:var(--s1);border:1px solid var(--b2);border-radius:24px;padding:28px 22px;max-width:340px;width:100%;text-align:center;animation:fup .3s ease;}
+.onb-slide{min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.onb-ic{font-size:56px;}
+.onb-title{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.onb-txt{font-size:13px;color:var(--t2);line-height:1.6;}
+.onb-dots{display:flex;gap:7px;justify-content:center;margin:18px 0;}
+.onb-dot{width:7px;height:7px;border-radius:50%;background:var(--s3);transition:all .2s;}
+.onb-dot.on{background:var(--a);width:20px;border-radius:4px;}
+.onb-btns{display:flex;gap:10px;}
+.onb-skip{flex:1;padding:12px;background:var(--s2);border:none;border-radius:12px;color:var(--t3);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.onb-next{flex:2;padding:12px;background:var(--ag);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
+
+.nlp-preview{display:none;gap:5px;flex-wrap:wrap;padding:0 0 6px;}
+.nlp-chip{font-size:10px;padding:2px 8px;border-radius:8px;background:var(--s2);color:var(--t2);border:1px solid var(--b);}
+.task.starred{border-color:var(--yel);}
+.task.selected{border-color:var(--a);background:rgba(124,110,247,.08);}
+.task-star.on{color:var(--yel);}
+.task-est{font-size:9px;color:var(--a3);background:rgba(63,245,192,.12);padding:1px 5px;border-radius:5px;}
+.smart-item{display:flex;align-items:center;gap:11px;padding:13px 14px;background:var(--s1);border-radius:var(--r);margin-bottom:5px;border:1px solid var(--b);cursor:pointer;transition:background .15s;}
+.smart-item:active{background:var(--s2);}
+.smart-ic{font-size:20px;}
+.smart-name{font-size:13px;font-weight:600;}
+.smart-cnt{margin-left:auto;background:var(--s3);padding:2px 9px;border-radius:9px;font-size:11px;color:var(--t2);}
+.batch-bar{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--a);border-radius:var(--r);margin-bottom:8px;color:#fff;}
+.batch-bar .b-info{font-size:12px;font-weight:600;flex:1;}
+.batch-btn{background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:6px 10px;color:#fff;cursor:pointer;font-size:14px;}
+.batch-x{background:none;border:none;color:#fff;cursor:pointer;font-size:16px;opacity:.8;}
+.tmpl-item{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--s1);border-radius:var(--r);margin-bottom:5px;border:1px solid var(--b);cursor:pointer;}
+.color-picker{display:flex;gap:8px;margin:8px 0;}
+.color-swatch{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-swatch.sel{border-color:var(--t);box-shadow:0 0 0 2px var(--a);}
+body.compact{--r:10px;}
+body.compact .task{padding:7px 10px;margin-bottom:3px;}
+body.compact .task-text{font-size:12px;}
+body.amoled{--bg:#000;--s1:#0a0a0f;--s2:#111118;--s3:#1a1a22;}
+body.accent-purple{--a:#7c6ef7;--a2:#e86af3;}
+body.accent-green{--a:#00c896;--a2:#3ff5c0;--ag:linear-gradient(135deg,#00c896,#3ff5c0);}
+body.accent-blue{--a:#4d94ff;--a2:#00c8e8;--ag:linear-gradient(135deg,#4d94ff,#00c8e8);}
+body.accent-orange{--a:#ff9f43;--a2:#ee5a24;--ag:linear-gradient(135deg,#ff9f43,#ee5a24);}
+body.accent-pink{--a:#ff6b9d;--a2:#c44569;--ag:linear-gradient(135deg,#ff6b9d,#c44569);}
+.search-result{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s1);border-radius:10px;margin-bottom:4px;border:1px solid var(--b);cursor:pointer;}
+@keyframes fup{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.task,.habit,.note,.proj,.stat-card{animation:fup .22s ease both;}
+.task:nth-child(2){animation-delay:.03s;}.task:nth-child(3){animation-delay:.06s;}
+.task:nth-child(4){animation-delay:.09s;}.task:nth-child(5){animation-delay:.12s;}
+</style>
+</head>
+<body>
+<div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+<div class="toast" id="toast"></div>
+<div id="app">
+  <div class="topbar">
+    <div><div class="app-name">Momentum</div><div class="app-date" id="hDate"></div></div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="globalSearchBtn">🔍</button>
+      <button class="icon-btn" id="exportBtn">📤</button>
+      <button class="icon-btn" id="importBtn">📥</button>
+      <button class="icon-btn" id="settingsBtn">⚙️</button>
+    </div>
+  </div>
+  <div class="content" id="content"></div>
+  <div class="inputbar" id="inputbar">
+    <div class="nlp-preview" id="nlpPreview"></div>
+    <div class="input-row">
+      <input class="quick-input" id="quickIn" placeholder="Завтра позвонить маме #семья важно">
+      <button class="add-fab" id="addBtn">+</button>
+    </div>
+  </div>
+  <nav class="navbar">
+    <div class="nav-btn active" data-nav="today"><span class="nav-icon">☀️</span><span class="nav-lbl">Сегодня</span></div>
+    <div class="nav-btn" data-nav="projects"><span class="nav-icon">📁</span><span class="nav-lbl">Проекты</span></div>
+    <div class="nav-btn" data-nav="habits"><span class="nav-icon">🔥</span><span class="nav-lbl">Привычки</span></div>
+    <div class="nav-btn" data-nav="stats"><span class="nav-icon">📊</span><span class="nav-lbl">Итоги</span></div>
+    <div class="nav-btn" data-nav="more"><span class="nav-icon">☰</span><span class="nav-lbl">Ещё</span></div>
+  </nav>
+</div>
+<div class="quick-actions" id="quickActions" style="display:none;"></div>
+<!-- TASK MODAL -->
+<div class="overlay" id="taskOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title" id="taskSheetTitle">Новая задача</div>
+  <input type="hidden" id="editId">
+  <div class="field-lbl">Название *</div><input class="field" id="fTitle" placeholder="Что нужно сделать?">
+  <div class="field-lbl">Описание</div><textarea class="field" id="fNote" placeholder="Детали, ссылки..."></textarea>
+  <div class="field-lbl">Приоритет</div>
+  <div class="p-row"><button class="p-btn p1" data-p="p1">🔴 Крит.</button><button class="p-btn p2" data-p="p2">🟡 Важно</button><button class="p-btn p3" data-p="p3">🟢 Обычно</button><button class="p-btn p4" data-p="p4">🔵 Фон</button></div>
+  <div class="field-lbl">Тег</div><input class="field" id="fTag" placeholder="работа, дом, здоровье...">
+  <div class="field-lbl">Дедлайн</div><input class="field" type="date" id="fDate">
+  <div class="field-lbl">Оценка времени</div>
+  <select class="field" id="fEstimate"><option value="0">Без оценки</option><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="120">2 часа</option><option value="240">4 часа</option><option value="480">8 часов</option></select>
+  <div class="field-lbl">Напомнить за</div>
+  <select class="field" id="fRemind"><option value="0">Без напоминания</option><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="1440">1 день</option></select>
+  <div class="field-lbl">Повтор</div>
+  <select class="field" id="fRepeat"><option value="none">Без повтора</option><option value="daily">Каждый день</option><option value="weekly">Каждую неделю</option><option value="workdays">Рабочие дни (Пн–Пт)</option></select>
+  <div class="field-lbl">Проект</div><select class="field" id="fProject"></select>
+  <div class="field-lbl">Подзадачи</div>
+  <div class="sub-list" id="subList"></div>
+  <div class="sub-row"><input class="sub-in" id="subIn" placeholder="Добавить подзадачу..."><button class="sub-add" id="subAddBtn">+ Добавить</button></div>
+  <button class="dashed-btn" id="aiDecompBtn" style="margin-top:0;margin-bottom:8px;font-size:12px;min-height:38px;">🤖 Разбить на подзадачи (AI)</button>
+  <button class="dashed-btn" id="saveTemplateBtn" style="margin-top:0;margin-bottom:8px;font-size:12px;min-height:38px;">🗂 Сохранить как шаблон</button>
+  <button class="save-btn" id="saveTaskBtn">💾 Сохранить</button>
+  <button class="del-btn" id="delTaskBtn" style="display:none">🗑 Удалить задачу</button>
+</div></div>
+<!-- HABIT MODAL -->
+<div class="overlay" id="habitOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title">Новая привычка</div>
+  <div class="field-lbl">Название</div><input class="field" id="hName" placeholder="Медитация, спорт, чтение...">
+  <div class="field-lbl">Эмодзи</div><input class="field" id="hEmoji" placeholder="⭐" maxlength="2">
+  <div class="field-lbl">Дни выполнения</div>
+  <div style="display:flex;gap:5px;margin-bottom:12px;" id="hDaysPick">
+    <button class="chip active" data-dsel="0">Пн</button><button class="chip active" data-dsel="1">Вт</button>
+    <button class="chip active" data-dsel="2">Ср</button><button class="chip active" data-dsel="3">Чт</button>
+    <button class="chip active" data-dsel="4">Пт</button><button class="chip" data-dsel="5">Сб</button>
+    <button class="chip" data-dsel="6">Вс</button>
+  </div>
+  <button class="save-btn" id="saveHabitBtn">💾 Добавить</button>
+</div></div>
+<!-- NOTE MODAL -->
+<div class="overlay" id="noteOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title" id="noteSheetTitle">Новая заметка</div>
+  <input type="hidden" id="noteEditId">
+  <div class="field-lbl">Заголовок</div><input class="field" id="nTitle" placeholder="Название заметки...">
+  <div class="field-lbl">Текст</div><textarea class="field" id="nBody" placeholder="Содержимое..." style="min-height:130px;"></textarea>
+  <button class="save-btn" id="saveNoteBtn">💾 Сохранить</button>
+  <button class="del-btn" id="delNoteBtn" style="display:none">🗑 Удалить</button>
+</div></div>
+<!-- PROJECT MODAL -->
+<div class="overlay" id="projOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title">Новый проект</div>
+  <div class="field-lbl">Название</div><input class="field" id="pjName" placeholder="Название проекта...">
+  <div class="field-lbl">Описание</div><input class="field" id="pjDesc" placeholder="Краткое описание...">
+  <button class="save-btn" id="saveProjBtn">💾 Создать</button>
+</div></div>
+<!-- QUICK TASK -->
+<div class="overlay" id="qTaskOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title">Задача в проект</div>
+  <input type="hidden" id="qProjId">
+  <div class="field-lbl">Название</div><input class="field" id="qTaskTitle" placeholder="Что нужно сделать?">
+  <button class="save-btn" id="saveQTaskBtn">💾 Добавить</button>
+</div></div>
+<!-- CONFIRM -->
+<div class="overlay" id="confirmOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title" id="confirmTitle">Подтверждение</div>
+  <div id="confirmText" style="font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.5;"></div>
+  <div class="confirm-btns"><button class="conf-btn conf-no" id="confirmNo">Отмена</button><button class="conf-btn conf-ok" id="confirmOk">Удалить</button></div>
+</div></div>
+<!-- GLOBAL SEARCH -->
+<div class="overlay" id="globalSearchOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title">🔍 Глобальный поиск</div>
+  <input class="field" id="gsInput" placeholder="Задачи, заметки, проекты..." style="margin-bottom:8px;">
+  <div id="gsResults"></div>
+</div></div>
+<!-- SETTINGS -->
+<div class="overlay" id="goalOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title">🌱 Новая цель на год</div>
+  <div class="field-lbl">Сфера жизни</div>
+  <div class="sphere-pick" id="spherePick"></div>
+  <div class="field-lbl">Цель</div><input class="field" id="goalText" placeholder="Например: Накопить 300000">
+  <div class="field-lbl">Числовая цель (необязательно)</div>
+  <div style="display:flex;gap:8px;"><input class="field" id="goalTarget" type="number" placeholder="300000" style="flex:1;"><input class="field" id="goalUnit" placeholder="₽ / кг / раз" style="width:110px;"></div>
+  <button class="save-btn" id="saveGoalBtn">💾 Создать цель</button>
+</div></div>
+<div class="onb-overlay" id="onbOverlay">
+  <div class="onb-card">
+    <div class="onb-slide" id="onbSlide"></div>
+    <div class="onb-dots" id="onbDots"></div>
+    <div class="onb-btns"><button class="onb-skip" id="onbSkip">Пропустить</button><button class="onb-next" id="onbNext">Далее →</button></div>
+  </div>
+</div>
+<div class="overlay" id="moreOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title">☰ Ещё</div>
+  <div class="more-grid">
+    <div class="more-item" data-more="pomodoro"><span class="more-ic">⏱</span><span>Помодоро</span></div>
+    <div class="more-item" data-more="notes"><span class="more-ic">📝</span><span>Заметки</span></div>
+    <div class="more-item" data-more="smartlists"><span class="more-ic">📋</span><span>Умные списки</span></div>
+    <div class="more-item" data-more="matrix"><span class="more-ic">🎯</span><span>Матрица</span></div>
+    <div class="more-item" data-more="goals"><span class="more-ic">🌱</span><span>Цели</span></div>
+    <div class="more-item" data-more="calendar"><span class="more-ic">📅</span><span>Календарь</span></div>
+    <div class="more-item" data-more="templates"><span class="more-ic">🗂</span><span>Шаблоны</span></div>
+    <div class="more-item" data-more="review"><span class="more-ic">📓</span><span>Обзор недели</span></div>
+    <div class="more-item" data-more="archive"><span class="more-ic">📦</span><span>Архив</span></div>
+    <div class="more-item" data-more="settings"><span class="more-ic">⚙️</span><span>Настройки</span></div>
+  </div>
+</div></div>
+<div class="overlay" id="settingsOverlay"><div class="sheet">
+  <div class="sheet-handle"></div><div class="sheet-title">⚙️ Настройки</div>
+  <div class="setting-row"><div><div class="setting-name">Тёмная тема</div><div class="setting-desc">Тёмный фон</div></div><button class="toggle on" id="toggleTheme"></button></div>
+  <div class="setting-row"><div><div class="setting-name">AMOLED</div><div class="setting-desc">Чёрный фон для OLED</div></div><button class="toggle" id="toggleAMOLED"></button></div>
+  <div class="setting-row"><div><div class="setting-name">Авто-тема</div><div class="setting-desc">Светлая днём, тёмная ночью</div></div><button class="toggle" id="toggleAutoTheme"></button></div>
+  <div class="setting-row"><div><div class="setting-name">Компактный режим</div><div class="setting-desc">Плотнее список задач</div></div><button class="toggle" id="toggleCompact"></button></div>
+  <div class="setting-row"><div><div class="setting-name">Уведомления</div><div class="setting-desc">Напоминания и Pomodoro</div></div><button class="toggle" id="toggleNotif"></button></div>
+  <div class="setting-row"><div><div class="setting-name">Звуки</div><div class="setting-desc">Звук таймера</div></div><button class="toggle on" id="toggleSound"></button></div>
+  <div class="setting-row"><div><div class="setting-name">Акцентный цвет</div></div></div>
+  <div class="color-picker"><div class="color-swatch" data-accent="purple" style="background:#7c6ef7"></div><div class="color-swatch" data-accent="green" style="background:#00c896"></div><div class="color-swatch" data-accent="blue" style="background:#4d94ff"></div><div class="color-swatch" data-accent="orange" style="background:#ff9f43"></div><div class="color-swatch" data-accent="pink" style="background:#ff6b9d"></div></div>
+  <div class="setting-row"><div><div class="setting-name">Длина фокуса</div></div>
+    <select class="field" id="pomDurSelect" style="width:80px;margin:0;padding:6px 8px;font-size:12px;">
+      <option value="15">15 мин</option><option value="20">20 мин</option><option value="25" selected>25 мин</option>
+      <option value="30">30 мин</option><option value="45">45 мин</option><option value="60">60 мин</option>
+    </select>
+  </div>
+  <div class="setting-row"><div><div class="setting-name">Автоархив</div><div class="setting-desc">Выполненные → архив</div></div>
+    <select class="field" id="archiveDaysSelect" style="width:90px;margin:0;padding:6px 8px;font-size:12px;">
+      <option value="0">Выкл</option><option value="1">1 день</option><option value="3">3 дня</option>
+      <option value="7" selected>7 дней</option><option value="14">14 дней</option><option value="30">30 дней</option>
+    </select>
+  </div>
+  <div class="setting-row"><div><div class="setting-name">AI API ключ</div><div class="setting-desc">Anthropic Claude</div></div></div>
+  <input class="field" id="apiKeyField" type="password" placeholder="sk-ant-api03-...">
+  <div class="setting-row"><div><div class="setting-name">Цвета тегов</div></div></div>
+  <div id="tagColorsList" style="margin-bottom:8px;"></div>
+  <div class="setting-row"><div><div class="setting-name">Память</div></div></div>
+  <div class="mem-bar"><div class="mem-fill-bg"><div class="mem-fill" id="memFill"></div></div><div class="mem-txt" id="memTxt">—</div></div>
+  <div style="height:6px;"></div>
+  <button class="save-btn" id="saveSettingsBtn" style="margin-bottom:10px;">✓ Готово</button>
+  <button class="del-btn" id="clearDataBtn">🗑 Сбросить все данные</button>
+</div></div>
+<script>
+const DEF={
+  tasks:[
+    {id:1,text:'Прочитать 20 минут',done:false,priority:'p2',tag:'развитие',note:'Глава 5',date:'',pid:null,status:'todo',subtasks:[],repeat:'none',doneAt:null},
+    {id:2,text:'Написать отчёт',done:false,priority:'p1',tag:'работа',note:'Дедлайн завтра',date:'',pid:1,status:'inprogress',subtasks:[{id:101,text:'Собрать данные',done:true},{id:102,text:'Оформить графики',done:false}],repeat:'none',doneAt:null},
+    {id:3,text:'Пробежка 5 км',done:true,priority:'p3',tag:'здоровье',note:'',date:'',pid:null,status:'done',subtasks:[],repeat:'daily',doneAt:Date.now()-86400000},
+    {id:4,text:'Созвониться с командой',done:false,priority:'p2',tag:'работа',note:'',date:'',pid:1,status:'todo',subtasks:[],repeat:'none',doneAt:null},
+  ],
+  habits:[
+    {id:1,name:'Медитация',streak:7,emoji:'🧘',days:[1,1,1,1,1,1,0],targetDays:[0,1,2,3,4]},
+    {id:2,name:'Спорт',streak:3,emoji:'💪',days:[0,1,0,1,1,1,0],targetDays:[0,1,2,3,4,5,6]},
+    {id:3,name:'Чтение',streak:12,emoji:'📚',days:[1,1,1,1,1,1,0],targetDays:[0,1,2,3,4,5,6]},
+  ],
+  notes:[
+    {id:1,title:'Идеи проекта',body:'Новый дизайн. Минимализм. Плавные анимации.',date:'сегодня'},
+    {id:2,title:'Список покупок',body:'Молоко, хлеб, овощи, фрукты, курица, рис',date:'вчера'},
+  ],
+  projects:[
+    {id:1,name:'Мобильное приложение',desc:'Разработка новой версии',color:'var(--a)'},
+    {id:2,name:'Курс по React',desc:'Продвинутые паттерны',color:'var(--a2)'},
+  ],
+  archive:[],
+  pomSessions:0,pomMode:'work',pomDur:25,
+  filter:'all',sortOrder:'priority',
+  theme:'dark',notif:false,sound:true,apiKey:'',archiveDays:7,
+  searchQuery:'',calMonth:null,calYear:null,calSelDate:null,
+  lifeGoals:[],customSpheres:[],habitView:'week',onboarded:false,
+  accent:'purple',amoled:false,compact:false,autoTheme:false,tagColors:{},templates:[],selectedTasks:[],
+  xp:0,level:1,weekDone:{},streak:0,lastActiveDate:null,bestStreak:0,
+};
+
+let S=JSON.parse(localStorage.getItem('momentum_v1')||'null')||DEF;
+if(!S.archive)S.archive=[];if(!S.weekDone)S.weekDone={};if(!S.moods)S.moods={};if(!S.xp)S.xp=0;if(!S.level)S.level=1;
+if(!S.habitView)S.habitView='week';if(!S.achievements)S.achievements={};if(!S.reflections)S.reflections={};if(!S.lifeGoals)S.lifeGoals=[];if(!S.customSpheres)S.customSpheres=[];if(S.onboarded===undefined)S.onboarded=false;
+if(!S.accent)S.accent='purple';if(S.amoled===undefined)S.amoled=false;if(S.compact===undefined)S.compact=false;if(S.autoTheme===undefined)S.autoTheme=false;if(!S.tagColors)S.tagColors={};if(!S.templates)S.templates=[];if(!S.selectedTasks)S.selectedTasks=[];if(!S.streak)S.streak=0;if(!S.bestStreak)S.bestStreak=0;if(S.lastActiveDate===undefined)S.lastActiveDate=null;
+if(S.archiveDays===undefined)S.archiveDays=7;if(S.pomDur===undefined)S.pomDur=25;
+if(!S.sortOrder)S.sortOrder='priority';if(S.sound===undefined)S.sound=true;if(!S.apiKey)S.apiKey='';
+S.tasks=S.tasks.map(t=>({subtasks:[],status:'todo',pid:null,date:'',note:'',repeat:'none',doneAt:null,pomCount:0,starred:false,estimate:0,remind:0,...t,pid:t.pid??t.projectId??null}));
+S.habits=S.habits.map(h=>({targetDays:[0,1,2,3,4,5,6],monthLog:{},...h}));
+
+let curTab='today',pomOn=false,pomSec=S.pomDur*60,pomTick=null,pomBgTime=null;
+let selPrio='p2',confirmCb=null,curProjId=null,tempSubs=[],searchDebounce=null,wakeLock=null,longPressTimer=null,focusTaskId=null;
+
+const NOW=new Date();
+S.calMonth=NOW.getMonth();S.calYear=NOW.getFullYear();S.calSelDate=null;
+
+function save(){try{localStorage.setItem('momentum_v1',JSON.stringify(S));}catch(e){toast('⚠️ Память заполнена!','err');}}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function todayStr(){return NOW.toISOString().slice(0,10);}
+function renderMD(text){return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');}
+function parseNLP(text){
+  const r={text:text,date:'',repeat:'none',priority:'p2',tag:'',remind:0};
+  const days={'пн':1,'вт':2,'ср':3,'чт':4,'пт':5,'сб':6,'вс':0};
+  // dates
+  const dm=[
+    {re:/\bсегодня\b/i,fn:()=>todayStr()},
+    {re:/\bзавтра\b/i,fn:()=>{const d=new Date();d.setDate(d.getDate()+1);return dateStr(d);}},
+    {re:/\bпослезавтра\b/i,fn:()=>{const d=new Date();d.setDate(d.getDate()+2);return dateStr(d);}},
+    {re:/через\s+(\d+)\s*(дн|день|дня|дней)/i,fn:m=>{const d=new Date();d.setDate(d.getDate()+parseInt(m[1]));return dateStr(d);}},
+    {re:/в\s+(пн|вт|ср|чт|пт|сб|вс)/i,fn:m=>{const t=days[m[1].toLowerCase()]??0;const d=new Date();d.setDate(d.getDate()+((t+7-d.getDay())%7||7));return dateStr(d);}},
+  ];
+  for(const p of dm){const m=r.text.match(p.re);if(m){r.date=p.fn(m);r.text=r.text.replace(m[0],'').trim();break;}}
+  // priority
+  if(/(срочно|критично|critical)/i.test(r.text)){r.priority='p1';r.text=r.text.replace(/(срочно|критично|critical)/i,'').trim();}
+  else if(/(важно)/i.test(r.text)){r.priority='p2';r.text=r.text.replace(/(важно)/i,'').trim();}
+  else if(/(потом|когда-нибудь|фон)/i.test(r.text)){r.priority='p4';r.text=r.text.replace(/(потом|когда-нибудь|фон)/i,'').trim();}
+  // repeat
+  if(/(каждый день|ежедневно)/i.test(r.text)){r.repeat='daily';r.text=r.text.replace(/(каждый день|ежедневно)/i,'').trim();}
+  else if(/(каждую неделю|еженедельно)/i.test(r.text)){r.repeat='weekly';r.text=r.text.replace(/(каждую неделю|еженедельно)/i,'').trim();}
+  // remind
+  const rm=r.text.match(/напомни(?:ть)?\s+за\s+(\d+)/i);if(rm){r.remind=parseInt(rm[1]);r.text=r.text.replace(rm[0],'').trim();}
+  // tags (multiple #tag) — take first as primary tag
+  const tags=[...r.text.matchAll(/#(\S+)/g)].map(m=>m[1]);
+  if(tags.length){r.tag=tags[0];r.text=r.text.replace(/#\S+/g,'').trim();}
+  r.text=r.text.replace(/\s{2,}/g,' ').trim();
+  return r;
+}
+
+function dateStr(d){return d.toISOString().slice(0,10);}
+
+// XP SYSTEM
+const XP_TASK=10,XP_HABIT=5,XP_POM=15,XP_SUB=3;
+const LV_NAMES=['Новичок','Стажёр','Практик','Специалист','Эксперт','Мастер','Гуру','Легенда','Миф','Бог продуктивности'];
+const ACHIEVEMENTS=[
+  {id:'first_task',name:'Первый шаг',ic:'✅',check:()=>S.tasks.filter(t=>t.done).length>0},
+  {id:'ten_tasks',name:'Продуктивный',ic:'💪',check:()=>S.tasks.filter(t=>t.done).length>=10},
+  {id:'fifty_tasks',name:'Машина',ic:'🚀',check:()=>S.tasks.filter(t=>t.done).length>=50},
+  {id:'pom10',name:'Фокусник',ic:'🍅',check:()=>S.pomSessions>=10},
+  {id:'pom50',name:'Монах',ic:'🧘',check:()=>S.pomSessions>=50},
+  {id:'habit7',name:'В системе',ic:'🔥',check:()=>S.habits.some(h=>h.streak>=7)},
+  {id:'habit30',name:'Железная воля',ic:'⚡',check:()=>S.habits.some(h=>h.streak>=30)},
+  {id:'streak7',name:'Неделя огня',ic:'🌟',check:()=>S.streak>=7},
+  {id:'streak30',name:'Несокрушимый',ic:'💎',check:()=>S.streak>=30},
+  {id:'level5',name:'Специалист',ic:'⭐',check:()=>S.level>=5},
+  {id:'level10',name:'Бог продуктивности',ic:'👑',check:()=>S.level>=10},
+  {id:'reflect7',name:'Мыслитель',ic:'📓',check:()=>Object.keys(S.reflections).length>=7},
+];
+function checkAchievements(){}
+
+function xpForLevel(lv){return lv*lv*50;}
+function addXP(n){}
+function updateXPBadge(){}
+function showLevelUp(){}
+
+// ARCHIVE
+function runAutoArchive(){
+  if(!S.archiveDays)return;
+  const cutoff=Date.now()-S.archiveDays*86400000;
+  S.tasks=S.tasks.filter(t=>{
+    if(t.done&&t.doneAt&&t.doneAt<cutoff){S.archive.unshift({...t,archivedAt:Date.now()});return false;}
+    return true;
+  });
+  if(S.archive.length>200)S.archive=S.archive.slice(0,200);
+}
+
+// RECURRING
+function handleRecurring(){
+  const dow=NOW.getDay();
+  S.tasks.forEach(t=>{
+    if(!t.done||!t.repeat||t.repeat==='none')return;
+    let reset=false;
+    if(t.repeat==='daily')reset=true;
+    else if(t.repeat==='weekly'&&t.doneAt&&Date.now()-t.doneAt>6*86400000)reset=true;
+    else if(t.repeat==='workdays'&&dow>=1&&dow<=5&&t.doneAt&&Date.now()-t.doneAt>20*3600000)reset=true;
+    if(reset){t.done=false;t.status='todo';t.doneAt=null;t.subtasks=t.subtasks.map(s=>({...s,done:false}));}
+  });
+}
+
+
+function updateStreak(){}
+function checkStreakBroken(){}
+function fireConfetti(){}
+
+function trackWeekDoneAdd(){const td=todayStr();if(!S.weekDone)S.weekDone={};S.weekDone[td]=(S.weekDone[td]||0)+1;}
+
+// TOAST
+function toast(msg,type=''){
+  const el=document.getElementById('toast');el.innerHTML=esc(msg);el.className='toast '+type+' show';
+  el.style.pointerEvents='none';
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2600);
+}
+let undoData=null;
+function toastUndo(msg,undoCb){
+  const el=document.getElementById('toast');
+  el.innerHTML=esc(msg)+'<span class="toast-undo" id="undoBtn">Отменить</span>';
+  el.className='toast show';el.style.pointerEvents='auto';
+  clearTimeout(el._t);el._t=setTimeout(()=>{el.classList.remove('show');undoData=null;},4000);
+  document.getElementById('undoBtn').addEventListener('click',()=>{
+    clearTimeout(el._t);el.classList.remove('show');
+    if(undoCb)undoCb();
+  });
+}
+
+// CONFIRM
+function confirm2(title,text,okCb,okLabel='Удалить'){
+  document.getElementById('confirmTitle').textContent=title;document.getElementById('confirmText').textContent=text;
+  document.getElementById('confirmOk').textContent=okLabel;confirmCb=okCb;openSheet('confirmOverlay');
+}
+document.getElementById('confirmOk').addEventListener('click',()=>{closeSheet('confirmOverlay');const cb=confirmCb;confirmCb=null;if(cb)cb();});
+document.getElementById('confirmNo').addEventListener('click',()=>{confirmCb=null;closeSheet('confirmOverlay');});
+
+// SHEETS
+function openSheet(id){document.getElementById(id).classList.add('open');}
+function closeSheet(id){document.getElementById(id).classList.remove('open');}
+['taskOverlay','habitOverlay','noteOverlay','projOverlay','confirmOverlay','qTaskOverlay','settingsOverlay','globalSearchOverlay','goalOverlay','moreOverlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeSheet(id);});
+});
+
+// DATE
+const MO=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MOS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const DA=['вс','пн','вт','ср','чт','пт','сб'];
+const WD7=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+document.getElementById('hDate').textContent=DA[NOW.getDay()]+', '+NOW.getDate()+' '+MO[NOW.getMonth()];
+
+// SETTINGS
+function applyTheme(){document.body.classList.toggle('light',S.theme==='light');}
+function applyAMOLED(){document.body.classList.toggle('amoled',S.amoled);}
+function applyCompact(){document.body.classList.toggle('compact',S.compact);}
+function applyAccent(){document.body.className=document.body.className.replace(/accent-\w+/g,'').trim();document.body.classList.add('accent-'+(S.accent||'purple'));}
+function checkAutoTheme(){if(!S.autoTheme)return;const h=NOW.getHours();const wantDark=(h>=19||h<7);if(wantDark&&S.theme!=='dark'){S.theme='dark';save();applyTheme();}else if(!wantDark&&S.theme!=='light'){S.theme='light';save();applyTheme();}}
+function syncSettings(){
+  applyTheme();
+  document.getElementById('toggleTheme')?.classList.toggle('on',S.theme==='dark');
+  document.getElementById('toggleAMOLED')?.classList.toggle('on',S.amoled);
+  document.getElementById('toggleAutoTheme')?.classList.toggle('on',S.autoTheme);
+  document.getElementById('toggleCompact')?.classList.toggle('on',S.compact);
+  document.querySelectorAll('.color-swatch').forEach(sw=>sw.classList.toggle('sel',sw.dataset.accent===(S.accent||'purple')));
+  document.getElementById('toggleNotif')?.classList.toggle('on',S.notif);
+  document.getElementById('toggleSound')?.classList.toggle('on',S.sound);
+  const pd=document.getElementById('pomDurSelect');if(pd)pd.value=S.pomDur;
+  const ad=document.getElementById('archiveDaysSelect');if(ad)ad.value=S.archiveDays;
+  const ak=document.getElementById('apiKeyField');if(ak)ak.value=S.apiKey||'';
+}
+document.getElementById('settingsBtn').addEventListener('click',()=>{syncSettings();updateMemBar();renderTagColors();openSheet('settingsOverlay');});
+document.getElementById('toggleTheme').addEventListener('click',function(){S.theme=S.theme==='dark'?'light':'dark';save();applyTheme();this.classList.toggle('on',S.theme==='dark');});
+document.getElementById('toggleAMOLED').addEventListener('click',function(){S.amoled=!S.amoled;save();applyAMOLED();this.classList.toggle('on',S.amoled);});
+document.getElementById('toggleAutoTheme').addEventListener('click',function(){S.autoTheme=!S.autoTheme;save();this.classList.toggle('on',S.autoTheme);checkAutoTheme();syncSettings();});
+document.getElementById('toggleCompact').addEventListener('click',function(){S.compact=!S.compact;save();applyCompact();this.classList.toggle('on',S.compact);});
+document.querySelectorAll('.color-swatch[data-accent]').forEach(sw=>sw.addEventListener('click',function(){S.accent=this.dataset.accent;save();applyAccent();document.querySelectorAll('.color-swatch').forEach(x=>x.classList.toggle('sel',x===this));}));
+document.getElementById('toggleNotif').addEventListener('click',function(){
+  S.notif=!S.notif;
+  if(S.notif&&'Notification'in window&&Notification.permission==='default')
+    Notification.requestPermission().then(p=>{S.notif=p==='granted';save();syncSettings();scheduleReminders();});
+  this.classList.toggle('on',S.notif);save();scheduleReminders();
+});
+document.getElementById('toggleSound').addEventListener('click',function(){S.sound=!S.sound;this.classList.toggle('on',S.sound);save();});
+document.getElementById('pomDurSelect').addEventListener('change',function(){S.pomDur=+this.value;if(!pomOn)pomSec=S.pomDur*60;save();});
+document.getElementById('archiveDaysSelect').addEventListener('change',function(){S.archiveDays=+this.value;save();});
+document.getElementById('apiKeyField').addEventListener('input',function(){S.apiKey=this.value.trim();save();});
+document.getElementById('saveSettingsBtn').addEventListener('click',()=>{save();closeSheet('settingsOverlay');toast('✓ Настройки сохранены','ok');});
+document.getElementById('clearDataBtn').addEventListener('click',()=>{confirm2('Сбросить всё?','Удалятся все данные.',()=>{localStorage.removeItem('momentum_v1');location.reload();},'Сбросить');});
+function renderTagColors(){const el=document.getElementById('tagColorsList');if(!el)return;const tags=[...new Set(S.tasks.map(t=>t.tag).filter(Boolean))];if(!tags.length){el.innerHTML='<div style="font-size:11px;color:var(--t3);">Тегов пока нет</div>';return;}el.innerHTML=tags.map(t=>'<div style="display:flex;align-items:center;gap:10px;padding:5px 0;"><span style="font-size:12px;flex:1;">'+esc(t)+'</span><input type="color" value="'+(S.tagColors[t]||'#7c6ef7')+'" data-tagcolor="'+esc(t)+'" style="width:30px;height:30px;border:none;background:none;cursor:pointer;"></div>').join('');el.querySelectorAll('[data-tagcolor]').forEach(inp=>inp.addEventListener('input',function(){S.tagColors[this.dataset.tagcolor]=this.value;save();}));}
+function updateMemBar(){
+  try{const kb=Math.round((localStorage.getItem('momentum_v1')||'').length/1024),pct=Math.min(100,Math.round(kb/5000*100));
+  const fill=document.getElementById('memFill'),txt=document.getElementById('memTxt');
+  if(fill){fill.style.width=pct+'%';fill.style.background=pct>80?'var(--red)':pct>50?'var(--yel)':'var(--a)';}
+  if(txt)txt.textContent=kb+' КБ / 5000 КБ';}catch(e){}
+}
+
+// EXPORT/IMPORT
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='momentum-'+todayStr()+'.json';a.click();URL.revokeObjectURL(url);toast('✅ Экспортировано','ok');
+});
+document.getElementById('importBtn').addEventListener('click',()=>{
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=async e=>{try{const data=JSON.parse(await e.target.files[0].text());if(!data.tasks||!data.habits)throw 0;S={...S,...data};S.tasks=S.tasks.map(t=>({subtasks:[],status:'todo',pid:null,date:'',note:'',repeat:'none',doneAt:null,...t}));save();render();toast('✅ Импорт успешен!','ok');}catch{toast('❌ Неверный файл','err');}};
+  inp.click();
+});
+
+// NOTIFICATIONS & SOUND
+function notif(title,body){if(S.notif&&'Notification'in window&&Notification.permission==='granted')new Notification(title,{body});}
+function playSound(){
+  if(!S.sound)return;
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)(),o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);o.frequency.setValueAtTime(880,ctx.currentTime);o.frequency.setValueAtTime(660,ctx.currentTime+.15);
+  g.gain.setValueAtTime(.3,ctx.currentTime);g.gain.linearRampToValueAtTime(0,ctx.currentTime+.4);o.start(ctx.currentTime);o.stop(ctx.currentTime+.4);}catch(e){}
+}
+
+// WAKE LOCK
+async function tryWakeLock(){if('wakeLock'in navigator){try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}}}
+function releaseWakeLock(){if(wakeLock){wakeLock.release();wakeLock=null;}}
+
+// AI
+async function callAI(q){
+  const ctx='Задачи: '+S.tasks.filter(t=>!t.done).slice(0,8).map(t=>'"'+t.text+'"('+t.priority+')').join(', ')+'. Выполнено: '+S.tasks.filter(t=>t.done).length+'/'+S.tasks.length+'. Привычки: '+S.habits.map(h=>h.name+'('+h.streak+'дн)').join(', ')+'. Pomodoro: '+S.pomSessions+'. Уровень: '+S.level;
+  if(S.apiKey&&S.apiKey.startsWith('sk-ant')){
+    try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'Ты AI-ассистент продуктивности Momentum. Кратко, по делу, на русском. Данные:\n'+ctx,messages:[{role:'user',content:q}]})});
+    const d=await res.json();if(d.error)throw 0;return d.content.map(b=>b.type==='text'?b.text:'').join('');}catch(e){}
+  }
+  return localAI(q);
+}
+function localAI(q){
+  q=q.toLowerCase().trim();
+  const pending=S.tasks.filter(t=>!t.done),done=S.tasks.filter(t=>t.done);
+  if(/приоритет|важн|начать|что.*делать|фокус/.test(q)){
+    if(!pending.length)return '🎉 Все задачи выполнены!';
+    const s=[...pending].sort((a,b)=>({p1:4,p2:3,p3:2,p4:1}[b.priority]||0)-({p1:4,p2:3,p3:2,p4:1}[a.priority]||0));
+    return '📊 <strong>Рекомендую начать:</strong><br>'+s.slice(0,3).map((t,i)=>(i+1)+'. '+esc(t.text)).join('<br>');
+  }
+  if(/план|расписани|день/.test(q)){
+    const h=pending.slice(0,Math.ceil(pending.length/2)),e2=pending.slice(Math.ceil(pending.length/2));
+    return '📅 <strong>План дня:</strong><br>🌅 Утро:<br>'+(h.map(t=>'• '+esc(t.text)).join('<br>')||'— свободно')+'<br><br>🌆 Вечер:<br>'+(e2.map(t=>'• '+esc(t.text)).join('<br>')||'— свободно');
+  }
+  if(/стат|прогресс|итог/.test(q)){
+    const pct=S.tasks.length?Math.round(done.length/S.tasks.length*100):0;
+    return '📈 <strong>Статистика:</strong><br>✅ Задач: '+done.length+'/'+S.tasks.length+' ('+pct+'%)<br>🍅 Pomodoro: '+S.pomSessions+' ('+S.pomSessions*S.pomDur+' мин)<br>🔥 Лучшая серия: '+Math.max(...S.habits.map(h=>h.streak),0)+' дн<br>🏆 Уровень: '+S.level;
+  }
+  if(/совет|лайфхак|продуктивн/.test(q)){
+    const tips=['💡 Разбей задачу по 1 Pomodoro.','🧠 Делай сложное с утра.','📵 Отключи уведомления во фокус-сессии.','🏆 Отмечай задачи — дофамин работает!','⏰ Правило 2 минут: < 2 мин — делай сразу.','🎯 Не более 3 ключевых задач в день.'];
+    return '🎯 <strong>Совет:</strong><br>'+tips[Math.floor(Math.random()*tips.length)];
+  }
+  if(/уровень|xp|очк/.test(q)){
+    const needed=xpForLevel(S.level);
+    return '🏆 Уровень: '+S.level+' ('+LV_NAMES[Math.min(S.level-1,LV_NAMES.length-1)]+')<br>XP: '+S.xp+'/'+needed+'<br>Задач до след. уровня: ~'+Math.ceil((needed-S.xp)/XP_TASK);
+  }
+  return '🤖 Спроси:<br>• <em>«что важнее»</em><br>• <em>«составь план»</em><br>• <em>«статистика»</em><br>• <em>«дай совет»</em><br>• <em>«мой уровень»</em>';
+}
+
+// GLOBAL SEARCH
+document.getElementById('globalSearchBtn').addEventListener('click',()=>{document.getElementById('gsInput').value='';document.getElementById('gsResults').innerHTML='';openSheet('globalSearchOverlay');setTimeout(()=>document.getElementById('gsInput').focus(),350);});
+document.getElementById('gsInput').addEventListener('input',function(){clearTimeout(this._t);this._t=setTimeout(()=>doGlobalSearch(this.value.trim()),200);});
+function doGlobalSearch(q){
+  const el=document.getElementById('gsResults');if(!q){el.innerHTML='';return;}
+  const ql=q.toLowerCase();
+  const tasks=S.tasks.filter(t=>t.text.toLowerCase().includes(ql)||(t.tag||'').toLowerCase().includes(ql)||(t.note||'').toLowerCase().includes(ql));
+  const notes=S.notes.filter(n=>n.title.toLowerCase().includes(ql)||n.body.toLowerCase().includes(ql));
+  const projs=S.projects.filter(p=>p.name.toLowerCase().includes(ql));
+  if(!tasks.length&&!notes.length&&!projs.length){el.innerHTML='<div class="empty"><div class="empty-ic">🔍</div><div class="empty-tx">Ничего не найдено</div></div>';return;}
+  let html='';
+  if(tasks.length){html+='<div class="gsearch-lbl">📋 Задачи ('+tasks.length+')</div>';html+=tasks.slice(0,8).map(t=>'<div class="gsearch-item" data-gstask="'+t.id+'"><span class="gsearch-icon">'+(t.done?'✅':'⬜')+'</span><div><div class="gsearch-text">'+esc(t.text)+'</div><div class="gsearch-sub">'+(t.tag||'')+(t.date?' · '+t.date:'')+'</div></div></div>').join('');}
+  if(notes.length){html+='<div class="gsearch-lbl">📝 Заметки ('+notes.length+')</div>';html+=notes.slice(0,5).map(n=>'<div class="gsearch-item" data-gsnote="'+n.id+'"><span class="gsearch-icon">📝</span><div><div class="gsearch-text">'+esc(n.title)+'</div><div class="gsearch-sub">'+esc(n.body.slice(0,50))+'</div></div></div>').join('');}
+  if(projs.length){html+='<div class="gsearch-lbl">📁 Проекты ('+projs.length+')</div>';html+=projs.map(p=>'<div class="gsearch-item" data-gsproj="'+p.id+'"><span class="gsearch-icon">📁</span><div><div class="gsearch-text">'+esc(p.name)+'</div><div class="gsearch-sub">'+esc(p.desc)+'</div></div></div>').join('');}
+  el.innerHTML=html;
+  el.querySelectorAll('[data-gstask]').forEach(item=>{item.addEventListener('click',function(){closeSheet('globalSearchOverlay');openEditTask(+this.dataset.gstask);});});
+  el.querySelectorAll('[data-gsnote]').forEach(item=>{item.addEventListener('click',function(){closeSheet('globalSearchOverlay');curTab='notes';syncTabs('notes');render();setTimeout(()=>openEditNote(+this.dataset.gsnote),300);});});
+  el.querySelectorAll('[data-gsproj]').forEach(item=>{item.addEventListener('click',function(){closeSheet('globalSearchOverlay');renderKanban(+this.dataset.gsproj);});});
+}
+
+// QUICK ACTIONS (long press)
+function showQuickActions(tid,x,y){
+  const t=S.tasks.find(t=>t.id===tid);if(!t)return;
+  const qa=document.getElementById('quickActions');
+  qa.innerHTML='<div class="qa-item" data-qa="select"><span class="qa-icon">☑️</span>Выбрать</div><div class="qa-sep"></div><div class="qa-item" data-qa="done"><span class="qa-icon">'+(t.done?'↩️':'✅')+'</span>'+(t.done?'Вернуть':'Выполнить')+'</div><div class="qa-sep"></div><div class="qa-item" data-qa="p1"><span class="qa-icon">🔴</span>Критично</div><div class="qa-item" data-qa="p2"><span class="qa-icon">🟡</span>Важно</div><div class="qa-item" data-qa="p3"><span class="qa-icon">🟢</span>Обычно</div><div class="qa-sep"></div><div class="qa-item" data-qa="edit"><span class="qa-icon">✏️</span>Редактировать</div><div class="qa-item" data-qa="del" style="color:var(--red)"><span class="qa-icon">🗑</span>Удалить</div>';
+  const W=window.innerWidth,H=window.innerHeight;
+  qa.style.cssText='display:block;left:'+Math.min(x,W-195)+'px;top:'+Math.min(y,H-270)+'px;';
+  qa.querySelectorAll('.qa-item').forEach(item=>{
+    item.addEventListener('click',function(){
+      const act=this.dataset.qa;qa.style.display='none';
+      if(act==='select'){toggleSelect(tid);}else if(act==='done'){t.done=!t.done;t.status=t.done?'done':'todo';if(t.done){t.doneAt=Date.now();trackWeekDoneAdd();}save();render();}
+      else if(['p1','p2','p3','p4'].includes(act)){t.priority=act;save();render();}
+      else if(act==='edit')openEditTask(tid);
+      else if(act==='del')confirm2('Удалить задачу?','',()=>{S.tasks=S.tasks.filter(t=>t.id!==tid);save();render();toast('🗑 Удалено');});
+    });
+  });
+  setTimeout(()=>{const close=()=>{qa.style.display='none';document.removeEventListener('click',close);};document.addEventListener('click',close);},50);
+}
+
+// FILTERS & SORT
+function getFilteredSorted(){
+  let tasks=S.tasks;
+  if(S.searchQuery){const q=S.searchQuery.toLowerCase();tasks=tasks.filter(t=>t.text.toLowerCase().includes(q)||(t.tag||'').toLowerCase().includes(q)||(t.note||'').toLowerCase().includes(q));}
+  const f=S.filter;
+  if(['p1','p2','p3','p4'].includes(f))tasks=tasks.filter(t=>t.priority===f);
+  else if(f==='work')tasks=tasks.filter(t=>t.tag==='работа');
+  else if(f==='health')tasks=tasks.filter(t=>['здоровье','спорт'].includes(t.tag));
+  else if(f==='done')tasks=tasks.filter(t=>t.done);
+  else if(f==='today_due')tasks=tasks.filter(t=>t.date===todayStr());
+  else if(f==='overdue')tasks=tasks.filter(t=>!t.done&&t.date&&t.date<todayStr());
+  if(S.sortOrder==='priority'){const pv={p1:4,p2:3,p3:2,p4:1};tasks=[...tasks].sort((a,b)=>{if(a.done!==b.done)return a.done?1:-1;return(pv[b.priority]||0)-(pv[a.priority]||0);});}
+  else if(S.sortOrder==='date'){tasks=[...tasks].sort((a,b)=>{if(!a.date&&!b.date)return 0;if(!a.date)return 1;if(!b.date)return -1;return a.date.localeCompare(b.date);});}
+  else if(S.sortOrder==='name'){tasks=[...tasks].sort((a,b)=>a.text.localeCompare(b.text));}
+  return tasks;
+}
+
+function taskH(t){
+  const TCLR={работа:'tg-pur',здоровье:'tg-grn',личное:'tg-pnk',развитие:'tg-pur',дом:'tg-grn',учёба:'tg-blu',спорт:'tg-grn',финансы:'tg-yel'};
+  const tc=TCLR[t.tag]||'tg-pur',proj=t.pid?S.projects.find(p=>p.id===t.pid):null;
+  const subs=t.subtasks||[],sDone=subs.filter(s=>s.done).length,overdue=t.date&&t.date<todayStr()&&!t.done;
+  const tagColor=S.tagColors&&S.tagColors[t.tag]?'style="background:'+S.tagColors[t.tag]+'33;color:'+S.tagColors[t.tag]+'"':'';
+  const sel=S.selectedTasks&&S.selectedTasks.includes(t.id);
+  return '<div class="task '+t.priority+(t.done?' done':'')+(overdue?' overdue':'')+(t.starred?' starred':'')+(sel?' selected':'')+'" data-tid="'+t.id+'">'
+    +'<div class="task-del-bg">🗑</div>'
+    +'<div class="task-inner">'
+    +'<div class="task-chk'+(t.done?' on':'')+'" data-id="'+t.id+'"></div>'
+    +'<div class="task-body" data-edit="'+t.id+'">'
+    +'<div class="task-text">'+renderMD(t.text)+'</div>'
+    +'<div class="task-meta">'
+    +(t.tag?'<span class="tag '+tc+'" '+tagColor+'>'+esc(t.tag)+'</span>':'')
+    +(proj?'<span class="tag tg-blu">📁 '+esc(proj.name)+'</span>':'')
+    +(t.date?'<span class="task-inf">'+(overdue?'🚨':'📅')+' '+t.date+'</span>':'')
+    +(t.estimate>0?'<span class="task-est">⏱ '+(t.estimate>=60?(t.estimate/60)+'ч':t.estimate+'м')+'</span>':'')
+    +(t.remind>0?'<span class="task-inf">🔔 '+t.remind+'м</span>':'')
+    +(subs.length?'<span class="task-inf">✅ '+sDone+'/'+subs.length+'</span>':'')
+    +(t.repeat&&t.repeat!=='none'?'<span class="repeat-badge">🔁 '+(t.repeat==='daily'?'ежедн':t.repeat==='weekly'?'еженед':'рабдни')+'</span>':'')
+    +(t.note?'<span class="task-inf">📝</span>':'')
+    +(t.pomCount?'<span class="task-inf">🍅 '+t.pomCount+'</span>':'')
+    +'</div>'
+    +(subs.length?'<div class="subtasks-wrap">'+subs.map(s=>'<div class="subtask-item" data-sid="'+s.id+'" data-pid="'+t.id+'"><div class="mini-chk'+(s.done?' on':'')+'"></div><div class="subtask-text'+(s.done?' done':'')+'">'+esc(s.text)+'</div></div>').join('')+'</div>':'')
+    +'</div>'
+    +'<div class="task-acts"><button class="task-act task-star'+(t.starred?' on':'')+'" data-star="'+t.id+'">'+(t.starred?'★':'☆')+'</button><button class="task-act" data-act="edit" data-id="'+t.id+'">✏️</button><button class="task-act" data-act="del" data-id="'+t.id+'">🗑</button></div>'
+    +'</div></div>';
+}
+</script>
+<script>
+// RENDER
+function render(){
+  const el=document.getElementById('content');
+  document.getElementById('inputbar').style.display=curTab==='today'?'':'none';
+  if(curTab==='today')renderToday(el);
+  else if(curTab==='projects')renderProjects(el);
+  else if(curTab==='habits')renderHabits(el);
+  else if(curTab==='pomodoro')renderPomodoro(el);
+  else if(curTab==='notes')renderNotes(el);
+  else if(curTab==='matrix')renderMatrix(el);
+  else if(curTab==='goals')renderGoals(el);
+  else if(curTab==='smartlists')renderSmartLists(el);
+  else if(curTab==='templates')renderTemplates(el);
+  else if(curTab==='review')renderReview(el);
+  else if(curTab==='archive')renderArchive(el);
+  bindContentEvents();initSwipeDelete();initLongPress();updateXPBadge();
+}
+
+
+function moodCardHTML(){return '';}
+
+
+// ===== SMART LISTS =====
+function getSmartLists(){
+  const today=todayStr();const we=new Date(NOW);we.setDate(we.getDate()+7);const weStr=dateStr(we);
+  return[
+    {id:'starred',name:'Избранное',icon:'⭐',filter:t=>t.starred&&!t.done},
+    {id:'overdue',name:'Просроченные',icon:'🚨',filter:t=>!t.done&&t.date&&t.date<today},
+    {id:'today',name:'На сегодня',icon:'📅',filter:t=>t.date===today&&!t.done},
+    {id:'week',name:'На этой неделе',icon:'🗓',filter:t=>!t.done&&t.date&&t.date>=today&&t.date<=weStr},
+    {id:'noproject',name:'Без проекта',icon:'📭',filter:t=>!t.done&&!t.pid},
+    {id:'recurring',name:'Повторяющиеся',icon:'🔁',filter:t=>t.repeat&&t.repeat!=='none'},
+    {id:'estimated',name:'С оценкой времени',icon:'⏱',filter:t=>!t.done&&t.estimate>0},
+  ];
+}
+let smartListOpen=null;
+function renderSmartLists(el){
+  document.getElementById('inputbar').style.display='none';
+  if(smartListOpen){
+    const list=getSmartLists().find(l=>l.id===smartListOpen);
+    if(list){
+      const tasks=S.tasks.filter(list.filter);
+      el.innerHTML='<button class="back-btn" id="slBack">← Умные списки</button><div class="sec-lbl">'+list.icon+' '+list.name+' <span class="sec-count">'+tasks.length+'</span></div>'+(tasks.length?tasks.map(taskH).join(''):'<div class="empty"><div class="empty-ic">'+list.icon+'</div><div class="empty-tx">Список пуст</div></div>')+'<div style="height:12px;"></div>';
+      el.querySelector('#slBack').addEventListener('click',()=>{smartListOpen=null;render();});
+      bindContentEvents();initSwipeDelete();initLongPress();
+      return;
+    }
+  }
+  el.innerHTML='<div class="sec-lbl">📋 Умные списки</div>'+getSmartLists().map(l=>{
+    const cnt=S.tasks.filter(l.filter).length;
+    return '<div class="smart-item" data-sl="'+l.id+'"><span class="smart-ic">'+l.icon+'</span><span class="smart-name">'+l.name+'</span><span class="smart-cnt">'+cnt+'</span></div>';
+  }).join('')+'<div style="height:12px;"></div>';
+  el.querySelectorAll('[data-sl]').forEach(it=>it.addEventListener('click',function(){smartListOpen=this.dataset.sl;render();}));
+}
+
+// ===== TEMPLATES =====
+function renderTemplates(el){
+  document.getElementById('inputbar').style.display='none';
+  el.innerHTML='<div class="sec-lbl">🗂 Шаблоны задач <span class="sec-count">'+S.templates.length+'</span></div>'
+    +(S.templates.length===0?'<div class="empty"><div class="empty-ic">🗂</div><div class="empty-tx">Сохраняй частые задачи<br>как шаблоны (в окне задачи)</div></div>':'')
+    +S.templates.map(t=>'<div class="tmpl-item"><span>🗂</span><div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+esc(t.name)+'</div><div style="font-size:10px;color:var(--t3);">'+t.tasks.length+' задач</div></div><button class="task-act" data-tmpl-use="'+t.id+'">➕</button><button class="task-act" data-tmpl-del="'+t.id+'">🗑</button></div>').join('')
+    +'<div style="height:12px;"></div>';
+  el.querySelectorAll('[data-tmpl-use]').forEach(b=>b.addEventListener('click',function(){const t=S.templates.find(x=>x.id===this.dataset.tmplUse);if(!t)return;t.tasks.forEach(tk=>S.tasks.unshift({id:Date.now()+Math.random(),text:tk.text,done:false,priority:tk.priority||'p2',tag:tk.tag||'',note:'',date:'',pid:null,status:'todo',subtasks:[],repeat:'none',doneAt:null,starred:false,estimate:tk.estimate||0,remind:0}));save();toast('✅ Шаблон применён','ok');curTab='today';setActiveNav('today');render();}));
+  el.querySelectorAll('[data-tmpl-del]').forEach(b=>b.addEventListener('click',function(){const id=this.dataset.tmplDel;confirm2('Удалить шаблон?','',()=>{S.templates=S.templates.filter(x=>x.id!==id);save();render();toast('🗑 Удалено');});}));
+}
+
+// ===== WEEKLY REVIEW =====
+function renderReview(el){
+  document.getElementById('inputbar').style.display='none';
+  const wa=new Date(NOW);wa.setDate(wa.getDate()-7);
+  const done=S.tasks.filter(t=>t.done&&t.doneAt&&t.doneAt>wa.getTime());
+  const byTag={};done.forEach(t=>{const tag=t.tag||'без тега';byTag[tag]=(byTag[tag]||0)+1;});
+  let text='📓 Обзор недели\n\n✅ Выполнено задач: '+done.length+'\n🍅 Pomodoro-сессий: '+S.pomSessions+' ('+S.pomSessions*S.pomDur+' мин)\n';
+  if(Object.keys(byTag).length)text+='\nПо тегам:\n'+Object.entries(byTag).map(([k,v])=>'• '+k+': '+v).join('\n');
+  if(done.length)text+='\n\nЗадачи:\n'+done.slice(0,20).map(t=>'• '+t.text).join('\n');
+  el.innerHTML='<div class="sec-lbl">📓 Обзор недели</div><div class="prog-card"><div style="white-space:pre-wrap;font-size:12px;line-height:1.7;color:var(--t2);">'+esc(text)+'</div></div><button class="dashed-btn" id="copyReview">📋 Скопировать отчёт</button><div style="height:12px;"></div>';
+  el.querySelector('#copyReview').addEventListener('click',()=>{navigator.clipboard?.writeText(text).then(()=>toast('📋 Скопировано','ok')).catch(()=>toast('Не удалось','err'));});
+}
+
+// ===== REMINDERS =====
+let notifTimers={};
+function scheduleReminders(){
+  Object.values(notifTimers).forEach(t=>clearTimeout(t));notifTimers={};
+  if(!S.notif)return;const now=Date.now();
+  S.tasks.forEach(t=>{if(t.done||!t.date||!t.remind)return;const due=new Date(t.date+'T09:00:00');const tt=due.getTime()-t.remind*60000;if(tt>now&&tt-now<86400000*2)notifTimers[t.id]=setTimeout(()=>notif('⏰ '+t.text,'Через '+t.remind+' мин'),tt-now);});
+}
+
+// ===== BATCH SELECT =====
+function toggleSelect(id){if(!S.selectedTasks)S.selectedTasks=[];if(S.selectedTasks.includes(id))S.selectedTasks=S.selectedTasks.filter(x=>x!==id);else S.selectedTasks.push(id);save();render();}
+
+function renderToday(el){
+  const all=getFilteredSorted(),pending=all.filter(t=>!t.done),done=all.filter(t=>t.done);
+  const totAll=S.tasks.length,dAll=S.tasks.filter(t=>t.done).length,pct=totAll?Math.round(dAll/totAll*100):0;
+  const overdueCnt=S.tasks.filter(t=>!t.done&&t.date&&t.date<todayStr()).length;
+  el.innerHTML='<div class="ai-card"><div class="ai-head"><div class="ai-ava">🤖</div><div><div class="ai-name">AI Ассистент</div><div class="ai-sub">'+(S.apiKey?'✨ Claude':'Локальный')+'</div></div>'+(S.apiKey?'<div class="ai-badge">API</div>':'')+'</div><div class="ai-row"><input class="ai-in" id="aiIn" placeholder="Спроси: что важнее? / дай совет..."><button class="ai-go" id="aiGoBtn">Спросить</button></div><div class="ai-ans" id="aiAns"></div></div>'
+    +(S.selectedTasks&&S.selectedTasks.length?'<div class="batch-bar"><span class="b-info">Выбрано: '+S.selectedTasks.length+'</span><button class="batch-btn" id="batchDone">✅</button><button class="batch-btn" id="batchStar">⭐</button><button class="batch-btn" id="batchDel">🗑</button><button class="batch-x" id="batchClear">✕</button></div>':'')
+    +'<div class="prog-card"><div class="prog-head"><span>Прогресс дня</span><span>'+dAll+'/'+totAll+' · '+pct+'%</span></div><div class="prog-bg"><div class="prog-fill" style="width:'+pct+'%"></div></div></div>'
+    +'<div class="stat-row"><div class="stat-card"><div class="stat-val">'+pending.length+'</div><div class="stat-lbl">Активных</div></div><div class="stat-card"><div class="stat-val">'+dAll+'</div><div class="stat-lbl">Выполнено</div></div><div class="stat-card"><div class="stat-val">'+(overdueCnt>0?'⚠️'+overdueCnt:S.pomSessions)+'</div><div class="stat-lbl">'+(overdueCnt>0?'Просрочено':'Помодоро')+'</div></div></div>'
+    +'<div class="search-row"><div class="search-wrap"><span class="search-ico">🔍</span><input class="search-in" id="searchIn" placeholder="Поиск задач..." value="'+esc(S.searchQuery)+'"></div><button class="search-x'+(S.searchQuery?' show':'')+'" id="searchX">✕</button></div>'
+    +'<div class="chips"><button class="chip'+(S.filter==='all'?' active':'')+'" data-f="all">Все</button><button class="chip'+(S.filter==='p1'?' active':'')+'" data-f="p1">🔴 Критично</button><button class="chip'+(S.filter==='p2'?' active':'')+'" data-f="p2">🟡 Важно</button><button class="chip'+(S.filter==='work'?' active':'')+'" data-f="work">💼 Работа</button><button class="chip'+(S.filter==='health'?' active':'')+'" data-f="health">💪 Здоровье</button><button class="chip'+(S.filter==='done'?' active':'')+'" data-f="done">✅ Готово</button><button class="chip'+(S.filter==='today_due'?' active':'')+'" data-f="today_due">📅 Сегодня</button>'+(overdueCnt>0?'<button class="chip'+(S.filter==='overdue'?' active':'')+'" data-f="overdue" style="color:var(--red)">🚨 Просрочено</button>':'')+'</div>'
+    +'<div class="sort-row"><button class="sort-btn" id="sortBtn">'+(S.sortOrder==='priority'?'🔴 По приоритету':S.sortOrder==='date'?'📅 По дате':'🔤 По имени')+' ▾</button></div>'
+    +(S.filter!=='done'&&pending.length?'<div class="sec-lbl">Активные <span class="sec-count">'+pending.length+'</span></div>'+pending.map(taskH).join(''):'')
+    +((S.filter==='done'||S.filter==='all')&&done.length?'<div class="sec-lbl">Выполнено <span class="sec-count">'+done.length+'</span></div>'+done.map(taskH).join(''):'')
+    +(all.length===0?'<div class="empty"><div class="empty-ic">'+(!S.searchQuery&&S.filter==='all'?'✨':'🔍')+'</div><div class="empty-tx">'+(S.searchQuery?'Ничего не найдено':S.filter==='all'?'Пока нет задач.<br>Добавь первую внизу 👇':'В этом фильтре пусто.<br>Нажми «Все», чтобы увидеть задачи')+'</div>'+(!S.searchQuery&&S.filter==='all'?'<button class="empty-act" id="emptyAddBtn">+ Добавить</button>':'')+(S.filter!=='all'&&!S.searchQuery?'<button class="empty-act" id="emptyAllBtn">← Показать все</button>':'')+'</div>':'')
+    +'<div style="height:12px;"></div>';
+}
+
+function renderProjects(el){
+  el.innerHTML='<div class="sec-lbl">Проекты <span class="sec-count">'+S.projects.length+'</span></div>'
+    +S.projects.map(p=>{const pt=S.tasks.filter(t=>t.pid===p.id),pd=pt.filter(t=>t.done).length,pp=pt.length?Math.round(pd/pt.length*100):0;
+    return '<div class="proj" data-projid="'+p.id+'"><div class="proj-name" style="color:'+p.color+'">📁 '+esc(p.name)+'</div><div class="proj-desc">'+esc(p.desc)+'</div><div class="proj-meta"><span style="font-size:10px;color:var(--t3);">'+pd+'/'+pt.length+' задач</span><div class="proj-bar-bg"><div class="proj-bar-fill" style="width:'+pp+'%;background:'+p.color+'"></div></div><span style="font-size:10px;color:var(--t3);">'+pp+'%</span></div></div>';}).join('')
+    +'<button class="dashed-btn" id="addProjBtn">+ Создать проект</button><div style="height:12px;"></div>';
+}
+
+function buildMonthGrid(h){
+  const y=NOW.getFullYear(),m=NOW.getMonth(),din=new Date(y,m+1,0).getDate(),tdD=NOW.getDate();
+  if(!h.monthLog)h.monthLog={};
+  const key=y+'-'+m;
+  if(!h.monthLog[key])h.monthLog[key]=Array(din).fill(0);
+  let cells='';
+  for(let d=1;d<=din;d++){cells+='<div class="mgrid-cell'+(h.monthLog[key][d-1]?' on':'')+(d===tdD?' today':'')+'" data-mh="'+h.id+'" data-md="'+(d-1)+'">'+(h.monthLog[key][d-1]?'':d)+'</div>';}
+  return '<div class="mgrid-wrap"><div class="mgrid-name">'+h.emoji+' '+esc(h.name)+' <span style="font-size:9px;color:var(--t3);margin-left:auto;font-weight:400;">'+MOS[m]+'</span></div><div class="mgrid-days">'+cells+'</div></div>';
+}
+function renderHabits(el){
+  const todayDow=(NOW.getDay()+6)%7;
+  el.innerHTML='<div class="sec-lbl">Привычки <span class="sec-count">'+S.habits.length+'</span></div>'
+    +'<div class="sort-row"><button class="sort-btn" id="habitViewToggle">'+(S.habitView==='month'?'🗓 Месяц':'📅 Неделя')+' ▾</button></div>'
+    +(S.habitView==='month'?S.habits.map(buildMonthGrid).join(''):'')
+    +(S.habitView==='month'?'':S.habits.map(h=>'<div class="habit"><div class="habit-top"><div class="habit-name">'+h.emoji+' '+esc(h.name)+'</div><div class="habit-streak">🔥 '+h.streak+' дн.</div></div><div class="habit-days">'+h.days.map((d,i)=>'<div class="hday'+(d?' on':'')+(i===todayDow?' today':'')+'" data-hid="'+h.id+'" data-day="'+i+'"><span class="hday-v">'+(d?'✓':'')+'</span><span class="hday-l">'+WD7[i]+'</span></div>').join('')+'</div><button class="habit-del" data-hdel="'+h.id+'">🗑</button></div>').join(''))
+    +'<button class="dashed-btn" id="addHabitBtn">+ Добавить привычку</button><div style="height:12px;"></div>';
+}
+
+function renderPomodoro(el){
+  const total=S.pomDur*60,C=2*Math.PI*65,dots=[0,1,2,3].map(i=>'<div class="pom-dot'+(i<S.pomSessions%4?' on':'')+'"></div>').join('');
+  const pendingTasks=S.tasks.filter(t=>!t.done);
+  el.innerHTML='<div class="sec-lbl">Таймер Pomodoro</div>'
+    +'<div class="pom-card">'
+    +'<div class="pom-ring"><svg class="pom-svg" width="150" height="150" viewBox="0 0 150 150"><circle class="pom-bg" cx="75" cy="75" r="65"/><circle class="pom-pr" cx="75" cy="75" r="65" stroke="'+(S.pomMode==='work'?'var(--a)':'var(--a3)')+'" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(pomSec/total))+'"/></svg><div class="pom-t" id="pomDisp">'+fmt(pomSec)+'</div></div>'
+    +'<div class="pom-lbl">'+(S.pomMode==='work'?'⚡ Фокус — '+S.pomDur+' мин':'☕ Перерыв — 5 мин')+'</div>'
+    +'<div class="pom-dots">'+dots+'</div>'
+    +'<div class="pom-btns"><button class="pom-btn sec" id="pomReset">↺</button><button class="pom-btn pri" id="pomPlay">'+(pomOn?'⏸ Пауза':'▶ Старт')+'</button><button class="pom-btn sec" id="pomSwitch">'+(S.pomMode==='work'?'☕':'⚡')+'</button></div>'
+    +(pendingTasks.length?'<div style="width:100%;"><div class="field-lbl">Фокус на задаче</div><select class="pom-task-sel" id="pomTaskSel"><option value="">— Выбрать —</option>'+pendingTasks.map(t=>'<option value="'+t.id+'">'+esc(t.text)+'</option>').join('')+'</select></div>':'')
+    +'</div>'
+    +'<div class="sec-lbl">Сегодня</div>'
+    +'<div class="stat-row"><div class="stat-card"><div class="stat-val">'+S.pomSessions+'</div><div class="stat-lbl">Сессий</div></div><div class="stat-card"><div class="stat-val">'+S.pomSessions*S.pomDur+'</div><div class="stat-lbl">Мин</div></div><div class="stat-card"><div class="stat-val">'+Math.round(S.pomSessions*S.pomDur/60*10)/10+'</div><div class="stat-lbl">Часов</div></div></div>'
+    +'<div style="height:12px;"></div>';
+}
+
+function renderNotes(el){
+  el.innerHTML='<div class="sec-lbl">Заметки <span class="sec-count">'+S.notes.length+'</span></div>'
+    +S.notes.map(n=>'<div class="note" data-nid="'+n.id+'"><div class="note-title">'+esc(n.title)+'</div><div class="note-body">'+esc(n.body)+'</div><div class="note-date">'+n.date+'</div><button class="note-del" data-ndel="'+n.id+'">🗑</button></div>').join('')
+    +'<button class="dashed-btn" id="addNoteBtn">+ Новая заметка</button><div style="height:12px;"></div>';
+}
+
+
+
+const BASE_SPHERES=['Работа','Личное','Финансы'];
+const SPHERE_IC={'Работа':'💼','Личное':'🏠','Финансы':'💰'};
+function allSpheres(){return [...BASE_SPHERES,...(S.customSpheres||[])];}
+function sphereIcon(sp){return SPHERE_IC[sp]||'🎯';}
+let goalSphere='Работа';
+
+function goalProgress(g){
+  if(g.target&&g.target>0){const cur=g.current||0;return Math.min(100,Math.round(cur/g.target*100));}
+  const linked=g.taskIds?S.tasks.filter(t=>g.taskIds.includes(t.id)):[];
+  if(linked.length){return Math.round(linked.filter(t=>t.done).length/linked.length*100);}
+  return g.done?100:0;
+}
+function renderGoals(el){
+  document.getElementById('inputbar').style.display='none';
+  let html='<div class="sec-lbl">🌱 Цели по сферам жизни <span class="sec-count" style="cursor:pointer" id="goalHelp">?</span></div>';
+  allSpheres().forEach(sp=>{
+    const goals=S.lifeGoals.filter(g=>g.sphere===sp);
+    if(!goals.length)return;
+    html+='<div class="sec-lbl" style="color:var(--a)">'+sphereIcon(sp)+' '+esc(sp)+'</div>';
+    html+=goals.map(g=>{
+      const pct=goalProgress(g);
+      const metric=(g.target&&g.target>0)?'<div style="font-size:11px;color:var(--t3);margin-top:4px;">'+(g.current||0).toLocaleString('ru')+' / '+g.target.toLocaleString('ru')+' '+esc(g.unit||'')+'</div>':'';
+      const metricBtns=(g.target&&g.target>0)?'<button class="task-act" data-ginc="'+g.id+'" style="width:auto;padding:0 8px;font-size:11px;">+</button>':'<button class="task-act" data-gtoggle="'+g.id+'" style="width:auto;padding:0 8px;font-size:10px;">'+(g.done?'↩️':'✅')+'</button>';
+      return '<div class="goal-card"><button class="goal-del" data-gdel="'+g.id+'">🗑</button><div class="goal-sphere">'+sphereIcon(sp)+' '+esc(sp)+'</div><div class="goal-text">'+esc(g.text)+'</div>'+metric+'<div class="goal-prog"><div class="proj-bar-bg"><div class="proj-bar-fill" style="width:'+pct+'%;background:var(--a)"></div></div><span style="font-size:10px;color:var(--t3)">'+pct+'%</span>'+metricBtns+'</div></div>';
+    }).join('');
+  });
+  if(!S.lifeGoals.length)html+='<div class="empty"><div class="empty-ic">🌱</div><div class="empty-tx">Поставь цели по сферам:<br>Работа, Личное, Финансы<br>или добавь свою</div></div>';
+  html+='<button class="dashed-btn" id="addGoalBtn">+ Новая цель</button><div style="height:12px;"></div>';
+  el.innerHTML=html;
+  el.querySelector('#addGoalBtn')?.addEventListener('click',openNewGoal);
+  el.querySelector('#goalHelp')?.addEventListener('click',()=>toast('💡 Цель с числом (накопить 300000) показывает прогресс в %. Жми + чтобы добавить значение.'));
+  el.querySelectorAll('[data-gdel]').forEach(b=>b.addEventListener('click',function(){const id=+this.dataset.gdel;confirm2('Удалить цель?','',()=>{S.lifeGoals=S.lifeGoals.filter(g=>g.id!==id);save();render();toast('🗑 Удалено');});}));
+  el.querySelectorAll('[data-gtoggle]').forEach(b=>b.addEventListener('click',function(){const id=+this.dataset.gtoggle,g=S.lifeGoals.find(x=>x.id===id);if(g){g.done=!g.done;save();render();}}));
+  el.querySelectorAll('[data-ginc]').forEach(b=>b.addEventListener('click',function(){const id=+this.dataset.ginc,g=S.lifeGoals.find(x=>x.id===id);if(!g)return;const v=prompt('Добавить к прогрессу «'+g.text+'»:\nТекущее: '+(g.current||0)+' '+(g.unit||''),'');if(v===null)return;const num=parseFloat(v.replace(',','.'));if(isNaN(num)){toast('⚠️ Введите число','err');return;}g.current=(g.current||0)+num;if(g.current>=g.target){g.done=true;toast('🎉 Цель достигнута!','ok');}save();render();}));
+}
+function buildSpherePicker(){
+  const pick=document.getElementById('spherePick');
+  pick.innerHTML=allSpheres().map(sp=>'<button class="sphere-btn'+(sp===goalSphere?' sel':'')+'" data-sphere="'+esc(sp)+'">'+sphereIcon(sp)+' '+esc(sp)+'</button>').join('')+'<button class="sphere-btn" id="addSphereBtn" style="border-style:dashed;">+ Своя</button>';
+  pick.querySelectorAll('.sphere-btn[data-sphere]').forEach(b=>b.addEventListener('click',function(){goalSphere=this.dataset.sphere;pick.querySelectorAll('.sphere-btn').forEach(x=>x.classList.toggle('sel',x===this));}));
+  document.getElementById('addSphereBtn')?.addEventListener('click',()=>{const name=prompt('Название новой сферы:','');if(!name||!name.trim())return;const n=name.trim();if(!S.customSpheres.includes(n)&&!BASE_SPHERES.includes(n)){S.customSpheres.push(n);save();}goalSphere=n;buildSpherePicker();});
+}
+function openNewGoal(){goalSphere='Работа';document.getElementById('goalText').value='';document.getElementById('goalTarget').value='';document.getElementById('goalUnit').value='';buildSpherePicker();openSheet('goalOverlay');setTimeout(()=>document.getElementById('goalText').focus(),350);}
+
+function renderReflect(el){el.innerHTML='';}
+
+function renderAchievements(el){el.innerHTML='';}
+
+function renderMatrix(el){
+  document.getElementById('inputbar').style.display='';
+  const today=todayStr();
+  const isUrgent=t=>t.priority==='p1'||(t.date&&t.date<=today);
+  const isImportant=t=>t.priority==='p1'||t.priority==='p2';
+  const pending=S.tasks.filter(t=>!t.done);
+  const q1=pending.filter(t=>isUrgent(t)&&isImportant(t));
+  const q2=pending.filter(t=>!isUrgent(t)&&isImportant(t));
+  const q3=pending.filter(t=>isUrgent(t)&&!isImportant(t));
+  const q4=pending.filter(t=>!isUrgent(t)&&!isImportant(t));
+  const cell=(tasks,q,title,sub)=>'<div class="mx-cell '+q+'" data-quad="'+q+'"><div class="mx-title '+q+'">'+title+'</div>'+(tasks.length?tasks.map(t=>'<div class="mx-task'+(t.done?' done':'')+'" data-mxedit="'+t.id+'" draggable="true">'+esc(t.text)+'</div>').join(''):'<div class="mx-empty">'+sub+'</div>')+'</div>';
+  el.innerHTML='<div class="sec-lbl">🎯 Матрица Эйзенхауэра <span class="sec-count" style="cursor:pointer" id="mxHelp">?</span></div>'
+    +'<div class="mx-hint">Перетаскивай задачи между квадрантами — приоритет и срочность изменятся автоматически.</div>'
+    +'<div class="matrix">'
+    +cell(q1,'q1','🔥 Срочно + Важно','Делай сейчас')
+    +cell(q2,'q2','📅 Важно, не срочно','Планируй')
+    +cell(q3,'q3','⚡ Срочно, не важно','Делегируй')
+    +cell(q4,'q4','🗑 Не срочно, не важно','Удали')
+    +'</div>'
+    +'<div class="mx-hint" style="margin-top:12px;">💡 Фокусируйся на «Важно, не срочно» — это путь к долгосрочному успеху.</div>'
+    +'<div style="height:12px;"></div>';
+  el.querySelector('#mxHelp')?.addEventListener('click',()=>toast('💡 Срочно = дедлайн сегодня/раньше. Важно = приоритет 🔴 или 🟡.'));
+  el.querySelectorAll('[data-mxedit]').forEach(c=>{c.addEventListener('click',function(){openEditTask(+this.dataset.mxedit);});});
+  // drag between quadrants
+  function applyQuadrant(tid,quad){
+    const t=S.tasks.find(x=>x.id===tid);if(!t)return;
+    // q1 urgent+important, q2 important not urgent, q3 urgent not important, q4 neither
+    if(quad==='q1'){t.priority='p1';t.date=todayStr();}
+    else if(quad==='q2'){t.priority='p2';if(t.date&&t.date<=todayStr())t.date='';}
+    else if(quad==='q3'){t.priority='p3';t.date=todayStr();}
+    else if(quad==='q4'){t.priority='p4';if(t.date&&t.date<=todayStr())t.date='';}
+    save();renderMatrix(el);toast('✅ Перемещено','ok');
+  }
+  el.querySelectorAll('.mx-task[draggable]').forEach(card=>{
+    card.addEventListener('dragstart',function(e){e.dataTransfer.setData('text/plain',this.dataset.mxedit);this.style.opacity='.4';});
+    card.addEventListener('dragend',function(){this.style.opacity='';});
+  });
+  el.querySelectorAll('.mx-cell[data-quad]').forEach(c=>{
+    c.addEventListener('dragover',e=>{e.preventDefault();c.style.borderColor='var(--a)';});
+    c.addEventListener('dragleave',()=>c.style.borderColor='');
+    c.addEventListener('drop',function(e){e.preventDefault();this.style.borderColor='';const tid=+e.dataTransfer.getData('text/plain');applyQuadrant(tid,this.dataset.quad);});
+  });
+  // touch drag for mobile
+  let tDrag=null,tGhost=null,tsx=0,tsy=0;
+  el.querySelectorAll('.mx-task[draggable]').forEach(card=>{
+    card.addEventListener('touchstart',function(e){const t=e.touches[0];tsx=t.clientX;tsy=t.clientY;tDrag=this;tGhost=null;},{passive:true});
+    card.addEventListener('touchmove',function(e){const t=e.touches[0];if(!tGhost&&(Math.abs(t.clientX-tsx)>8||Math.abs(t.clientY-tsy)>8)){const r=this.getBoundingClientRect();tGhost=this.cloneNode(true);tGhost.style.cssText='position:fixed;left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;opacity:.85;pointer-events:none;z-index:999;background:var(--s3);border-radius:7px;padding:8px;';document.body.appendChild(tGhost);this.style.opacity='.3';}if(tGhost){e.preventDefault();tGhost.style.left=(t.clientX-40)+'px';tGhost.style.top=(t.clientY-20)+'px';el.querySelectorAll('.mx-cell').forEach(c=>{const cr=c.getBoundingClientRect();c.style.borderColor=(t.clientX>=cr.left&&t.clientX<=cr.right&&t.clientY>=cr.top&&t.clientY<=cr.bottom)?'var(--a)':'';});}},{passive:false});
+    card.addEventListener('touchend',function(e){if(tGhost){const t=e.changedTouches[0];tGhost.remove();tGhost=null;this.style.opacity='';let dropped=false;el.querySelectorAll('.mx-cell').forEach(c=>{const cr=c.getBoundingClientRect();if(!dropped&&t.clientX>=cr.left&&t.clientX<=cr.right&&t.clientY>=cr.top&&t.clientY<=cr.bottom){dropped=true;applyQuadrant(+this.dataset.mxedit,c.dataset.quad);}c.style.borderColor='';});}tDrag=null;});
+  });
+}
+
+function renderArchive(el){
+  document.getElementById('inputbar').style.display='none';
+  el.innerHTML='<div class="sec-lbl">Архив <span class="sec-count">'+S.archive.length+'</span></div>'
+    +(S.archive.length===0?'<div class="empty"><div class="empty-ic">📦</div><div class="empty-tx">Архив пуст.<br>Выполненные задачи попадают сюда автоматически.</div></div>':'')
+    +S.archive.map(t=>'<div class="archive-item"><span style="font-size:16px;">✅</span><div style="flex:1;min-width:0;"><div style="font-size:13px;">'+esc(t.text)+'</div><div style="font-size:10px;color:var(--t3);margin-top:2px;">'+(t.tag||'')+(t.date?' · '+t.date:'')+' · '+new Date(t.archivedAt||Date.now()).toLocaleDateString('ru')+'</div></div><button class="archive-restore" data-aid="'+t.id+'">Вернуть</button></div>').join('')
+    +(S.archive.length>0?'<button class="del-btn" id="clearArchiveBtn" style="margin-top:8px;">🗑 Очистить архив</button>':'')
+    +'<div style="height:12px;"></div>';
+  el.querySelectorAll('[data-aid]').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      const id=+this.dataset.aid,t=S.archive.find(x=>x.id===id);if(!t)return;
+      S.archive=S.archive.filter(x=>x.id!==id);t.done=false;t.status='todo';t.doneAt=null;delete t.archivedAt;
+      S.tasks.unshift(t);save();renderArchive(el);toast('↩️ Задача возвращена','ok');
+    });
+  });
+  el.querySelector('#clearArchiveBtn')?.addEventListener('click',()=>{confirm2('Очистить архив?','',()=>{S.archive=[];save();renderArchive(el);toast('🗑 Архив очищен');});});
+}
+
+
+function pieChart(data,size){
+  const total=data.reduce((s,d)=>s+d.val,0);if(!total)return '<div style="font-size:11px;color:var(--t3);text-align:center;padding:20px;">Нет данных</div>';
+  let ang=-Math.PI/2,paths='';const r=size/2,cx=r,cy=r;
+  data.forEach(d=>{if(!d.val)return;const a=d.val/total*Math.PI*2;const x1=cx+r*Math.cos(ang),y1=cy+r*Math.sin(ang);ang+=a;const x2=cx+r*Math.cos(ang),y2=cy+r*Math.sin(ang);const large=a>Math.PI?1:0;paths+='<path d="M'+cx+','+cy+' L'+x1+','+y1+' A'+r+','+r+' 0 '+large+',1 '+x2+','+y2+' Z" fill="'+d.color+'"/>';});
+  return '<svg class="pie-svg" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">'+paths+'</svg>';
+}
+function pieBlock(title,data){
+  const total=data.reduce((s,d)=>s+d.val,0);
+  return '<div class="sec-lbl">'+title+'</div><div class="pie-wrap">'+pieChart(data,90)+'<div class="pie-legend">'+data.map(d=>'<div class="pie-leg-item"><span class="pie-dot" style="background:'+d.color+'"></span>'+d.name+'<span class="pie-leg-val">'+d.val+(total?' ('+Math.round(d.val/total*100)+'%)':'')+'</span></div>').join('')+'</div></div>';
+}
+
+function renderStats(){
+  const el=document.getElementById('content');document.getElementById('inputbar').style.display='none';
+  const d=S.tasks.filter(t=>t.done).length,tot=S.tasks.length,overdue=S.tasks.filter(t=>!t.done&&t.date&&t.date<todayStr()).length;
+  const days7=[];for(let i=6;i>=0;i--){const dt=new Date(NOW);dt.setDate(dt.getDate()-i);const ds=dateStr(dt);days7.push({lbl:WD7[(dt.getDay()+6)%7],val:(S.weekDone&&S.weekDone[ds])||0,isToday:i===0});}
+  const maxVal=Math.max(...days7.map(d=>d.val),1);
+  el.innerHTML=pieBlock('📊 Задачи по приоритетам',[{name:'🔴 Критично',val:S.tasks.filter(t=>t.priority==='p1').length,color:'#f56060'},{name:'🟡 Важно',val:S.tasks.filter(t=>t.priority==='p2').length,color:'#f5ae50'},{name:'🟢 Обычно',val:S.tasks.filter(t=>t.priority==='p3').length,color:'#3ff5c0'},{name:'🔵 Фон',val:S.tasks.filter(t=>t.priority==='p4').length,color:'#50c5f5'}])
+    +pieBlock('📈 Задачи по статусам',[{name:'✅ Готово',val:S.tasks.filter(t=>t.done).length,color:'#3ff5c0'},{name:'⚡ В работе',val:S.tasks.filter(t=>t.status==='inprogress'&&!t.done).length,color:'#50c5f5'},{name:'📝 К делу',val:S.tasks.filter(t=>t.status==='todo'&&!t.done).length,color:'#7c6ef7'}])
+    +'<div class="sec-lbl">🔥 Активность за год</div>'
+    +'<div class="heatmap-wrap"><div class="heatmap-grid">'+(function(){let cells='';for(let i=363;i>=0;i--){const dt=new Date(NOW);dt.setDate(dt.getDate()-i);const ds=dateStr(dt),c=(S.weekDone&&S.weekDone[ds])||0;const bg=c===0?'var(--s3)':c<=1?'rgba(63,245,192,.3)':c<=3?'rgba(63,245,192,.55)':c<=5?'rgba(63,245,192,.8)':'var(--grn)';cells+='<div class="heatmap-cell" style="background:'+bg+'" title="'+ds+': '+c+'"></div>';}return cells;})()+'</div><div class="heat-lbl">меньше <span class="heatmap-cell" style="background:var(--s3)"></span><span class="heatmap-cell" style="background:rgba(63,245,192,.3)"></span><span class="heatmap-cell" style="background:rgba(63,245,192,.55)"></span><span class="heatmap-cell" style="background:var(--grn)"></span> больше</div></div>'
+    +'<div class="sec-lbl">📊 Статистика</div>'
+    +'<div class="stat-row"><div class="stat-card"><div class="stat-val">'+d+'</div><div class="stat-lbl">Выполнено</div></div><div class="stat-card"><div class="stat-val">'+S.pomSessions+'</div><div class="stat-lbl">Pomodoro</div></div></div>'
+    +'<div class="stat-row"><div class="stat-card"><div class="stat-val">'+Math.max(...S.habits.map(h=>h.streak),0)+'</div><div class="stat-lbl">Лучшая серия</div></div><div class="stat-card"><div class="stat-val">'+S.archive.length+'</div><div class="stat-lbl">В архиве</div></div></div>'
+    +'<div class="sec-lbl">Задач за 7 дней</div>'
+    +'<div class="prog-card" style="padding-bottom:14px;"><div class="bar-chart">'+days7.map(d=>{const h=Math.max(4,Math.round(d.val/maxVal*56));return'<div class="bar-col"><div class="bar-val">'+(d.val||'')+'</div><div class="bar'+(d.isToday?' today':'')+'" style="height:'+h+'px"></div><div class="bar-lbl">'+d.lbl+'</div></div>';}).join('')+'</div></div>'
+    +'<div class="sec-lbl">Настроение за 7 дней</div>'
+    +'<div class="prog-card"><div class="bar-chart" style="height:auto;align-items:center;">'+(function(){const ms=['😣','😕','😐','🙂','😄'];let out='';for(let i=6;i>=0;i--){const dt=new Date(NOW);dt.setDate(dt.getDate()-i);const ds=dateStr(dt);const mv=S.moods[ds];out+='<div class="bar-col"><div style="font-size:20px;">'+(mv!==undefined?ms[mv]:'·')+'</div><div class="bar-lbl">'+WD7[(dt.getDay()+6)%7]+'</div></div>';}return out;})()+'</div></div>'
+    +'<div class="sec-lbl">Прогресс</div>'
+    +'<div class="prog-card"><div class="prog-head"><span>Задачи</span><span>'+(tot?Math.round(d/tot*100):0)+'%</span></div><div class="prog-bg"><div class="prog-fill" style="width:'+(tot?d/tot*100:0)+'%"></div></div></div>'
+    +'<div class="prog-card"><div class="prog-head"><span>Фокус-время</span><span>'+S.pomSessions*S.pomDur+' мин</span></div><div class="prog-bg"><div class="prog-fill" style="width:'+Math.min(100,S.pomSessions*S.pomDur/240*100)+'%"></div></div></div>'
+    +(overdue>0?'<div class="prog-card" style="border-color:var(--red)"><div class="prog-head"><span style="color:var(--red)">🚨 Просроченных</span><span style="color:var(--red)">'+overdue+'</span></div></div>':'')
+    +'<div class="sec-lbl">Привычки</div>'
+    +S.habits.map(h=>'<div class="prog-card"><div class="prog-head"><span>'+h.emoji+' '+esc(h.name)+'</span><span>'+h.streak+' дн.</span></div><div class="prog-bg"><div class="prog-fill" style="width:'+Math.min(100,h.streak/30*100)+'%;background:var(--a)"></div></div></div>').join('')
+    +'<div class="sec-lbl">По приоритетам</div>'
+    +'<div class="stat-row"><div class="stat-card"><div class="stat-val" style="font-size:18px;">🔴 '+S.tasks.filter(t=>t.priority==='p1').length+'</div><div class="stat-lbl">Критичных</div></div><div class="stat-card"><div class="stat-val" style="font-size:18px;">🟡 '+S.tasks.filter(t=>t.priority==='p2').length+'</div><div class="stat-lbl">Важных</div></div><div class="stat-card"><div class="stat-val" style="font-size:18px;">🟢 '+S.tasks.filter(t=>t.priority==='p3').length+'</div><div class="stat-lbl">Обычных</div></div></div>'
+    +'<div style="height:12px;"></div>';
+}
+
+function renderCalendar(){
+  const el=document.getElementById('content');document.getElementById('inputbar').style.display='none';
+  const y=S.calYear,m=S.calMonth,din=new Date(y,m+1,0).getDate(),fd=(new Date(y,m,1).getDay()+6)%7;
+  const tDates=S.tasks.filter(t=>t.date).map(t=>t.date);
+  let cells=WD7.map(d=>'<div class="cal-dh">'+d+'</div>').join('');
+  for(let i=0;i<fd;i++)cells+='<div class="cal-d empty"></div>';
+  for(let d=1;d<=din;d++){
+    const ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isT=d===NOW.getDate()&&m===NOW.getMonth()&&y===NOW.getFullYear();
+    cells+='<div class="cal-d'+(isT?' today':ds===S.calSelDate?' selected':'')+' '+(tDates.includes(ds)?'has-task':'')+'" data-date="'+ds+'">'+d+'</div>';
+  }
+  const selTasks=S.calSelDate?S.tasks.filter(t=>t.date===S.calSelDate):S.tasks.filter(t=>!t.done);
+  el.innerHTML='<div class="cal-nav"><button class="cal-nav-btn" id="calPrev">‹</button><div class="cal-month-lbl">'+MOS[m]+' '+y+'</div><button class="cal-nav-btn" id="calNext">›</button></div>'
+    +'<div class="cal-grid">'+cells+'</div>'
+    +'<div class="sec-lbl" style="margin-top:14px;">'+(S.calSelDate?'📅 '+S.calSelDate:' Активные задачи')+' <span class="sec-count">'+selTasks.length+'</span></div>'
+    +selTasks.map(taskH).join('')+(selTasks.length?'':'<div class="empty"><div class="empty-ic">🎉</div><div class="empty-tx">Нет задач</div></div>')
+    +'<div style="height:12px;"></div>';
+  bindContentEvents();
+  el.querySelector('#calPrev')?.addEventListener('click',()=>{S.calMonth--;if(S.calMonth<0){S.calMonth=11;S.calYear--;}save();renderCalendar();});
+  el.querySelector('#calNext')?.addEventListener('click',()=>{S.calMonth++;if(S.calMonth>11){S.calMonth=0;S.calYear++;}save();renderCalendar();});
+  el.querySelectorAll('.cal-d[data-date]').forEach(d=>{d.addEventListener('click',function(){S.calSelDate=S.calSelDate===this.dataset.date?null:this.dataset.date;save();renderCalendar();});});
+}
+
+function renderKanban(projId){
+  curProjId=projId;const proj=S.projects.find(p=>p.id===projId);if(!proj)return;
+  const el=document.getElementById('content');document.getElementById('inputbar').style.display='none';
+  const pt=S.tasks.filter(t=>t.pid===projId);
+  const cols={todo:pt.filter(t=>t.status==='todo'&&!t.done),inprogress:pt.filter(t=>t.status==='inprogress'&&!t.done),done:pt.filter(t=>t.status==='done'||t.done)};
+  el.innerHTML='<button class="back-btn" id="backBtn">← Все проекты</button>'
+    +'<div style="margin-bottom:12px;"><div style="font-family:\'Syne\',sans-serif;font-size:17px;font-weight:700;color:'+proj.color+'">'+esc(proj.name)+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">'+esc(proj.desc)+'</div></div>'
+    +'<div class="sec-lbl">Kanban</div>'
+    +'<div class="kanban">'
+    +['todo','inprogress','done'].map((col,ci)=>'<div class="k-col" data-col="'+col+'"><div class="k-head">'+(ci===0?'📝 К делу':ci===1?'⚡ В работе':'✅ Готово')+' <span class="k-cnt">'+cols[col].length+'</span></div>'+cols[col].map(t=>'<div class="k-card" data-tid="'+t.id+'"><div class="k-dot" style="background:'+(t.priority==='p1'?'var(--red)':t.priority==='p2'?'var(--yel)':'var(--grn)')+'"></div><div style="flex:1;min-width:0;"><div>'+esc(t.text)+'</div>'+(((t.subtasks||[]).length)?'<div style="font-size:9px;color:var(--t3);margin-top:2px;">✅ '+(t.subtasks||[]).filter(s=>s.done).length+'/'+(t.subtasks||[]).length+'</div>':'')+'</div></div>').join('')+(ci===0?'<button class="k-add" id="kAddBtn">+ Добавить</button>':'')+'</div>').join('')
+    +'</div>'
+    +'<button class="del-btn" id="delProjBtn" style="margin-top:14px;">🗑 Удалить проект</button><div style="height:12px;"></div>';
+  bindKanbanEvents();
+}
+
+function bindKanbanEvents(){
+  const el=document.getElementById('content');
+  el.querySelector('#backBtn')?.addEventListener('click',()=>{curTab='projects';render();syncTabs('projects');});
+  el.querySelector('#kAddBtn')?.addEventListener('click',()=>{document.getElementById('qProjId').value=curProjId;document.getElementById('qTaskTitle').value='';openSheet('qTaskOverlay');});
+  el.querySelector('#delProjBtn')?.addEventListener('click',()=>{confirm2('Удалить проект?','',()=>{S.projects=S.projects.filter(p=>p.id!==curProjId);S.tasks=S.tasks.map(t=>t.pid===curProjId?{...t,pid:null}:t);save();curTab='projects';render();syncTabs('projects');toast('Проект удалён');});});
+  el.querySelectorAll('.k-card[data-tid]').forEach(c=>{c.addEventListener('click',function(){openEditTask(+this.dataset.tid);});});
+  initKanbanTouchDrag();
+  el.querySelectorAll('.k-card[data-tid]').forEach(card=>{
+    card.setAttribute('draggable','true');
+    card.addEventListener('dragstart',function(e){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',this.dataset.tid);this.style.opacity='.4';});
+    card.addEventListener('dragend',function(){this.style.opacity='';});
+  });
+  el.querySelectorAll('.k-col[data-col]').forEach(col=>{
+    col.addEventListener('dragover',e=>{e.preventDefault();col.classList.add('drag-over');});
+    col.addEventListener('dragleave',()=>col.classList.remove('drag-over'));
+    col.addEventListener('drop',function(e){e.preventDefault();this.classList.remove('drag-over');moveTaskToCol(+e.dataTransfer.getData('text/plain'),this.dataset.col);});
+  });
+}
+
+function initKanbanTouchDrag(){
+  const el=document.getElementById('content');let touchId=null,dragCard=null,ghost=null,sx=0,sy=0;
+  el.querySelectorAll('.k-card[data-tid]').forEach(card=>{
+    card.addEventListener('touchstart',function(e){
+      if(e.touches.length!==1)return;const t=e.touches[0];touchId=t.identifier;sx=t.clientX;sy=t.clientY;dragCard=this;
+      const rect=this.getBoundingClientRect();ghost=this.cloneNode(true);
+      ghost.style.cssText='position:fixed;left:'+rect.left+'px;top:'+rect.top+'px;width:'+rect.width+'px;opacity:.85;pointer-events:none;z-index:999;border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.5);';
+      document.body.appendChild(ghost);this.style.opacity='.3';
+    },{passive:true});
+    card.addEventListener('touchmove',function(e){
+      if(!ghost)return;e.preventDefault();const t=Array.from(e.touches).find(t=>t.identifier===touchId);if(!t)return;
+      const dx=t.clientX-sx,dy=t.clientY-sy;ghost.style.left=(parseFloat(ghost.style.left)+dx)+'px';ghost.style.top=(parseFloat(ghost.style.top)+dy)+'px';sx=t.clientX;sy=t.clientY;
+      document.querySelectorAll('.k-col').forEach(col=>{const cr=col.getBoundingClientRect();col.classList.toggle('drag-over',t.clientX>=cr.left&&t.clientX<=cr.right&&t.clientY>=cr.top&&t.clientY<=cr.bottom);});
+    },{passive:false});
+    card.addEventListener('touchend',function(e){
+      if(!ghost)return;const t=Array.from(e.changedTouches).find(t=>t.identifier===touchId);
+      ghost.remove();ghost=null;if(dragCard)dragCard.style.opacity='';
+      document.querySelectorAll('.k-col').forEach(col=>{if(col.classList.contains('drag-over')&&t)moveTaskToCol(+this.dataset.tid,col.dataset.col);col.classList.remove('drag-over');});
+      dragCard=null;touchId=null;
+    });
+  });
+}
+
+function moveTaskToCol(tid,col){
+  const t=S.tasks.find(x=>x.id===tid);if(!t)return;t.status=col;t.done=col==='done';
+  if(t.done){t.doneAt=Date.now();addXP(XP_TASK);trackWeekDoneAdd();}
+  save();renderKanban(curProjId);toast('→ '+(col==='todo'?'К делу':col==='inprogress'?'В работе':'Готово'),'ok');
+}
+
+function bindContentEvents(){
+  const el=document.getElementById('content');
+  el.querySelectorAll('.task-chk').forEach(c=>{c.addEventListener('click',function(e){e.stopPropagation();const id=+this.dataset.id,t=S.tasks.find(x=>x.id===id);if(!t)return;t.done=!t.done;t.status=t.done?'done':'todo';if(t.done){t.doneAt=Date.now();addXP(XP_TASK);trackWeekDoneAdd();updateStreak();fireConfetti();notif('✅ Выполнено',t.text);}save();render();});});
+  el.querySelectorAll('.task-act').forEach(b=>{b.addEventListener('click',function(e){e.stopPropagation();const id=+this.dataset.id,act=this.dataset.act;if(act==='edit')openEditTask(id);if(act==='del'){const idx=S.tasks.findIndex(t=>t.id===id);const removed=S.tasks[idx];S.tasks=S.tasks.filter(t=>t.id!==id);save();render();toastUndo('🗑 Задача удалена',()=>{S.tasks.splice(idx,0,removed);save();render();});}});});
+  el.querySelectorAll('.task-body[data-edit]').forEach(b=>{b.addEventListener('click',function(){openEditTask(+this.dataset.edit);});});
+  el.querySelectorAll('.task-star[data-star]').forEach(b=>{b.addEventListener('click',function(e){e.stopPropagation();const t=S.tasks.find(x=>x.id===+this.dataset.star);if(!t)return;t.starred=!t.starred;save();render();});});
+  el.querySelector('#batchDone')?.addEventListener('click',()=>{S.selectedTasks.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t&&!t.done){t.done=true;t.doneAt=Date.now();trackWeekDoneAdd();}});S.selectedTasks=[];save();render();toast('✅ Выполнено','ok');});
+  el.querySelector('#batchStar')?.addEventListener('click',()=>{S.selectedTasks.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t)t.starred=true;});S.selectedTasks=[];save();render();});
+  el.querySelector('#batchDel')?.addEventListener('click',()=>{confirm2('Удалить выбранные?','Будет удалено: '+S.selectedTasks.length,()=>{S.tasks=S.tasks.filter(t=>!S.selectedTasks.includes(t.id));S.selectedTasks=[];save();render();toast('🗑 Удалено');});});
+  el.querySelector('#batchClear')?.addEventListener('click',()=>{S.selectedTasks=[];save();render();});
+  el.querySelectorAll('.subtask-item').forEach(item=>{item.querySelector('.mini-chk')?.addEventListener('click',function(e){e.stopPropagation();const sid=+item.dataset.sid,pid=+item.dataset.pid,t=S.tasks.find(x=>x.id===pid);if(!t||!t.subtasks)return;const sub=t.subtasks.find(s=>s.id===sid);if(!sub)return;sub.done=!sub.done;if(sub.done)addXP(XP_SUB);save();render();});});
+  el.querySelectorAll('.chip[data-f]').forEach(c=>{c.addEventListener('click',function(){S.filter=this.dataset.f;save();render();});});
+  el.querySelector('#sortBtn')?.addEventListener('click',()=>{const o=['priority','date','name'];S.sortOrder=o[(o.indexOf(S.sortOrder)+1)%o.length];save();render();});
+  const si=el.querySelector('#searchIn');if(si)si.addEventListener('input',function(){clearTimeout(searchDebounce);searchDebounce=setTimeout(()=>{S.searchQuery=this.value.trim();save();render();},250);});
+  el.querySelector('#searchX')?.addEventListener('click',()=>{S.searchQuery='';save();render();});
+  const aiIn=el.querySelector('#aiIn'),aiGo=el.querySelector('#aiGoBtn');
+  if(aiIn&&aiGo){aiGo.addEventListener('click',runAI);aiIn.addEventListener('keydown',e=>{if(e.key==='Enter')runAI();});}
+  el.querySelector('#emptyAddBtn')?.addEventListener('click',openNewTask);
+  el.querySelector('#emptyAllBtn')?.addEventListener('click',()=>{S.filter='all';save();render();});
+  el.querySelectorAll('[data-mood]').forEach(b=>{b.addEventListener('click',function(){S.moods[todayStr()]=+this.dataset.mood;addXP(2);save();render();toast('Настроение записано 💜','ok');});});
+  el.querySelector('#moodReset')?.addEventListener('click',()=>{delete S.moods[todayStr()];save();render();});
+  el.querySelectorAll('.hday[data-hid]').forEach(d=>{d.addEventListener('click',function(){const hid=+this.dataset.hid,day=+this.dataset.day,h=S.habits.find(x=>x.id===hid);if(!h)return;const wasOff=!h.days[day];h.days[day]=wasOff?1:0;h.streak=h.days.filter(d=>d).length;if(wasOff)addXP(XP_HABIT);save();render();});});
+  el.querySelectorAll('[data-hdel]').forEach(b=>{b.addEventListener('click',function(e){e.stopPropagation();const id=+this.dataset.hdel;confirm2('Удалить привычку?','',()=>{S.habits=S.habits.filter(h=>h.id!==id);save();render();toast('🗑 Удалено');});});});
+  el.querySelector('#habitViewToggle')?.addEventListener('click',()=>{S.habitView=S.habitView==='month'?'week':'month';save();render();});
+  el.querySelectorAll('[data-mh]').forEach(c=>{c.addEventListener('click',function(){const hid=+this.dataset.mh,md=+this.dataset.md,h=S.habits.find(x=>x.id===hid);if(!h)return;const key=NOW.getFullYear()+'-'+NOW.getMonth();if(!h.monthLog)h.monthLog={};if(!h.monthLog[key])h.monthLog[key]=[];const was=!h.monthLog[key][md];h.monthLog[key][md]=was?1:0;if(was)addXP(XP_HABIT);save();render();});});
+  el.querySelector('#addHabitBtn')?.addEventListener('click',()=>{document.getElementById('hName').value='';document.getElementById('hEmoji').value='';document.querySelectorAll('#hDaysPick .chip').forEach((c,i)=>c.classList.toggle('active',i<5));openSheet('habitOverlay');});
+  el.querySelector('#addProjBtn')?.addEventListener('click',()=>{document.getElementById('pjName').value='';document.getElementById('pjDesc').value='';openSheet('projOverlay');});
+  el.querySelectorAll('.proj[data-projid]').forEach(c=>{c.addEventListener('click',function(){renderKanban(+this.dataset.projid);});});
+  el.querySelectorAll('.note[data-nid]').forEach(c=>{c.addEventListener('click',function(){openEditNote(+this.dataset.nid);});});
+  el.querySelectorAll('[data-ndel]').forEach(b=>{b.addEventListener('click',function(e){e.stopPropagation();const id=+this.dataset.ndel;confirm2('Удалить заметку?','',()=>{S.notes=S.notes.filter(n=>n.id!==id);save();render();toast('🗑 Удалено');});});});
+  el.querySelector('#addNoteBtn')?.addEventListener('click',openNewNote);
+  el.querySelector('#pomPlay')?.addEventListener('click',togglePom);
+  el.querySelector('#pomReset')?.addEventListener('click',resetPom);
+  el.querySelector('#pomSwitch')?.addEventListener('click',switchPomMode);
+  const pts=el.querySelector('#pomTaskSel');if(pts){pts.value=focusTaskId||'';pts.addEventListener('change',function(){focusTaskId=this.value?+this.value:null;});}
+}
+
+function initSwipeDelete(){
+  document.querySelectorAll('.task').forEach(task=>{
+    const inner=task.querySelector('.task-inner'),bg=task.querySelector('.task-del-bg');if(!inner||!bg)return;
+    let sx=0,sy=0,dx=0,active=false;
+    task.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;active=true;dx=0;},{passive:true});
+    task.addEventListener('touchmove',e=>{if(!active)return;const cx=e.touches[0].clientX,cy=e.touches[0].clientY;dx=cx-sx;if(Math.abs(cy-sy)>Math.abs(dx)&&Math.abs(dx)<10){active=false;return;}if(dx<-5){const off=Math.max(dx,-80);inner.style.transform='translateX('+off+'px)';bg.style.opacity=Math.min(1,Math.abs(off)/80);e.preventDefault();}},{passive:false});
+    task.addEventListener('touchend',()=>{active=false;if(dx<-60){const id=+task.dataset.tid;inner.style.transform='translateX(-100%)';bg.style.opacity='1';setTimeout(()=>{const idx=S.tasks.findIndex(t=>t.id===id);const removed=S.tasks[idx];S.tasks=S.tasks.filter(t=>t.id!==id);save();render();toastUndo('🗑 Задача удалена',()=>{S.tasks.splice(idx,0,removed);save();render();});},180);}else{inner.style.transform='';bg.style.opacity='0';}});
+  });
+}
+
+function initLongPress(){
+  document.querySelectorAll('.task').forEach(task=>{
+    task.addEventListener('touchstart',function(e){const id=+this.dataset.tid;longPressTimer=setTimeout(()=>{const touch=e.touches[0];showQuickActions(id,touch.clientX,touch.clientY);if(navigator.vibrate)navigator.vibrate(30);},500);},{passive:true});
+    task.addEventListener('touchend',()=>clearTimeout(longPressTimer),{passive:true});
+    task.addEventListener('touchmove',()=>clearTimeout(longPressTimer),{passive:true});
+  });
+}
+
+async function runAI(){
+  const inp=document.getElementById('aiIn'),ans=document.getElementById('aiAns'),btn=document.getElementById('aiGoBtn');
+  if(!inp||!ans||!btn)return;const q=inp.value.trim();if(!q)return;
+  btn.disabled=true;ans.innerHTML='<div class="ai-thinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div> <span>Думаю...</span></div>';ans.classList.add('open');
+  try{const r=await callAI(q);ans.innerHTML=r.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');inp.value='';}
+  finally{btn.disabled=false;}
+}
+
+// TASK CRUD
+function openNewTask(){document.getElementById('editId').value='';document.getElementById('taskSheetTitle').textContent='Новая задача';document.getElementById('fTitle').value='';document.getElementById('fNote').value='';document.getElementById('fTag').value='';document.getElementById('fDate').value='';document.getElementById('fRepeat').value='none';document.getElementById('fEstimate').value='0';document.getElementById('fRemind').value='0';document.getElementById('delTaskBtn').style.display='none';populateProjSelect(null);setPrio('p2');tempSubs=[];renderSubsModal();openSheet('taskOverlay');setTimeout(()=>document.getElementById('fTitle').focus(),350);}
+function openEditTask(id){const t=S.tasks.find(x=>x.id===id);if(!t)return;document.getElementById('editId').value=id;document.getElementById('taskSheetTitle').textContent='Редактировать';document.getElementById('fTitle').value=t.text;document.getElementById('fNote').value=t.note||'';document.getElementById('fTag').value=t.tag||'';document.getElementById('fDate').value=t.date||'';document.getElementById('fRepeat').value=t.repeat||'none';document.getElementById('fEstimate').value=t.estimate||0;document.getElementById('fRemind').value=t.remind||0;document.getElementById('delTaskBtn').style.display='';populateProjSelect(t.pid);setPrio(t.priority||'p2');tempSubs=JSON.parse(JSON.stringify(t.subtasks||[]));renderSubsModal();openSheet('taskOverlay');}
+function populateProjSelect(selId){document.getElementById('fProject').innerHTML='<option value="">Без проекта</option>'+S.projects.map(p=>'<option value="'+p.id+'"'+(p.id===selId?' selected':'')+'>'+esc(p.name)+'</option>').join('');}
+function setPrio(p){selPrio=p;document.querySelectorAll('.p-btn').forEach(b=>b.classList.toggle('sel',b.dataset.p===p));}
+document.querySelectorAll('.p-btn').forEach(b=>{b.addEventListener('click',function(){setPrio(this.dataset.p);});});
+function renderSubsModal(){
+  document.getElementById('subList').innerHTML=tempSubs.map((s,i)=>'<div class="sub-list-item"><div class="mini-chk'+(s.done?' on':'')+'" data-idx="'+i+'"></div><div class="sub-item-text">'+esc(s.text)+'</div><button class="sub-rm" data-ridx="'+i+'">✕</button></div>').join('');
+  document.querySelectorAll('#subList .mini-chk[data-idx]').forEach(c=>{c.addEventListener('click',function(){const i=+this.dataset.idx;if(tempSubs[i])tempSubs[i].done=!tempSubs[i].done;renderSubsModal();});});
+  document.querySelectorAll('#subList [data-ridx]').forEach(b=>{b.addEventListener('click',function(){tempSubs.splice(+this.dataset.ridx,1);renderSubsModal();});});
+}
+document.getElementById('subAddBtn').addEventListener('click',()=>{const inp=document.getElementById('subIn'),v=inp.value.trim();if(!v)return;tempSubs.push({id:Date.now()+Math.random(),text:v,done:false});inp.value='';renderSubsModal();});
+document.getElementById('subIn').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('subAddBtn').click();});
+document.getElementById('saveTaskBtn').addEventListener('click',()=>{
+  const title=document.getElementById('fTitle').value.trim();if(!title){toast('⚠️ Введите название','err');return;}
+  const eid=document.getElementById('editId').value,pid=document.getElementById('fProject').value;
+  const obj={text:title,priority:selPrio,tag:document.getElementById('fTag').value.trim().replace(/^#/,''),note:document.getElementById('fNote').value.trim(),date:document.getElementById('fDate').value,repeat:document.getElementById('fRepeat').value,estimate:+document.getElementById('fEstimate').value,remind:+document.getElementById('fRemind').value,pid:pid?+pid:null,subtasks:JSON.parse(JSON.stringify(tempSubs))};
+  if(eid){const t=S.tasks.find(x=>x.id===+eid);if(t)Object.assign(t,obj);toast('✏️ Обновлено','ok');}
+  else{S.tasks.unshift({id:Date.now(),done:false,status:'todo',doneAt:null,...obj});toast('✅ Добавлено','ok');}
+  closeSheet('taskOverlay');save();render();
+});
+document.getElementById('delTaskBtn').addEventListener('click',()=>{const eid=+document.getElementById('editId').value;closeSheet('taskOverlay');setTimeout(()=>confirm2('Удалить задачу?','',()=>{S.tasks=S.tasks.filter(t=>t.id!==eid);save();render();toast('🗑 Удалено');}),200);});
+document.getElementById('saveTemplateBtn').addEventListener('click',()=>{const title=document.getElementById('fTitle').value.trim();if(!title){toast('⚠️ Введите название','err');return;}S.templates.push({id:'t'+Date.now(),name:title,tasks:[{text:title,priority:selPrio,tag:document.getElementById('fTag').value.trim().replace(/^#/,''),estimate:+document.getElementById('fEstimate').value}]});save();toast('🗂 Шаблон сохранён','ok');});
+document.getElementById('saveHabitBtn').addEventListener('click',()=>{const name=document.getElementById('hName').value.trim();if(!name){toast('⚠️ Введите название','err');return;}const emoji=document.getElementById('hEmoji').value.trim()||'⭐';const targetDays=Array.from(document.querySelectorAll('#hDaysPick .chip.active')).map(c=>+c.dataset.dsel);S.habits.push({id:Date.now(),name,streak:0,emoji,days:[0,0,0,0,0,0,0],targetDays});document.getElementById('hName').value='';closeSheet('habitOverlay');save();render();toast('🔥 Привычка добавлена','ok');});
+document.querySelectorAll('#hDaysPick .chip').forEach(c=>{c.addEventListener('click',function(){this.classList.toggle('active');});});
+function openNewNote(){document.getElementById('noteEditId').value='';document.getElementById('noteSheetTitle').textContent='Новая заметка';document.getElementById('nTitle').value='';document.getElementById('nBody').value='';document.getElementById('delNoteBtn').style.display='none';openSheet('noteOverlay');setTimeout(()=>document.getElementById('nTitle').focus(),350);}
+function openEditNote(id){const n=S.notes.find(x=>x.id===id);if(!n)return;document.getElementById('noteEditId').value=id;document.getElementById('noteSheetTitle').textContent='Редактировать';document.getElementById('nTitle').value=n.title;document.getElementById('nBody').value=n.body;document.getElementById('delNoteBtn').style.display='';openSheet('noteOverlay');}
+document.getElementById('saveNoteBtn').addEventListener('click',()=>{const title=document.getElementById('nTitle').value.trim();if(!title){toast('⚠️ Введите заголовок','err');return;}const eid=document.getElementById('noteEditId').value,body=document.getElementById('nBody').value.trim();if(eid){const n=S.notes.find(x=>x.id===+eid);if(n){n.title=title;n.body=body;n.date='изменено';}toast('✏️ Обновлено','ok');}else{S.notes.unshift({id:Date.now(),title,body,date:'сегодня'});toast('📝 Создана','ok');}closeSheet('noteOverlay');save();render();});
+document.getElementById('delNoteBtn').addEventListener('click',()=>{const eid=+document.getElementById('noteEditId').value;closeSheet('noteOverlay');setTimeout(()=>confirm2('Удалить заметку?','',()=>{S.notes=S.notes.filter(n=>n.id!==eid);save();render();toast('🗑 Удалено');}),200);});
+document.getElementById('saveProjBtn').addEventListener('click',()=>{const name=document.getElementById('pjName').value.trim();if(!name){toast('⚠️ Введите название','err');return;}const cls=['var(--a)','var(--a2)','var(--a3)','var(--blu)','var(--yel)'];S.projects.push({id:Date.now(),name,desc:document.getElementById('pjDesc').value.trim(),color:cls[Math.floor(Math.random()*cls.length)]});document.getElementById('pjName').value='';document.getElementById('pjDesc').value='';closeSheet('projOverlay');save();render();toast('📁 Проект создан','ok');});
+document.getElementById('saveQTaskBtn').addEventListener('click',()=>{const title=document.getElementById('qTaskTitle').value.trim();if(!title){toast('⚠️ Введите название','err');return;}const pid=+document.getElementById('qProjId').value;S.tasks.unshift({id:Date.now(),text:title,done:false,priority:'p2',tag:'',note:'',date:'',pid,status:'todo',subtasks:[],repeat:'none',doneAt:null});document.getElementById('qTaskTitle').value='';closeSheet('qTaskOverlay');save();renderKanban(pid);toast('✅ Добавлено','ok');});
+
+document.getElementById('saveGoalBtn').addEventListener('click',()=>{const txt=document.getElementById('goalText').value.trim();if(!txt){toast('⚠️ Введите цель','err');return;}const target=parseFloat(document.getElementById('goalTarget').value)||0;const unit=document.getElementById('goalUnit').value.trim();S.lifeGoals.push({id:Date.now(),sphere:goalSphere,text:txt,done:false,taskIds:[],target:target,current:0,unit:unit});closeSheet('goalOverlay');save();render();toast('🌱 Цель добавлена','ok');});
+
+
+async function aiDecompose(text){
+  const prompt='Разбей задачу "'+text+'" на 3-5 конкретных подзадач. Ответь ТОЛЬКО JSON-массивом строк, без пояснений. Пример: ["шаг 1","шаг 2","шаг 3"]';
+  if(S.apiKey&&S.apiKey.startsWith('sk-ant')){
+    try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})});const dd=await res.json();if(!dd.error){const txt=dd.content.map(b=>b.type==='text'?b.text:'').join('');const arr=JSON.parse(txt.match(/\[[\s\S]*\]/)[0]);return arr.map(x=>typeof x==='string'?x:x.text);}}catch(e){}
+  }
+  // local fallback — умная разбивка по типу задачи
+  const parts=text.split(/\s+(?:и|,|;)\s+/).map(x=>x.trim()).filter(x=>x.length>2);
+  if(parts.length>=2)return parts;
+  const t=text.toLowerCase();
+  if(/(позвон|звон|связ)/.test(t))return['Найти номер/контакт','Подготовить что сказать','Позвонить','Записать договорённости'];
+  if(/(куп|магазин|заказ)/.test(t))return['Составить список','Сравнить цены','Купить/заказать','Проверить покупку'];
+  if(/(написа|текст|статья|отчёт|отчет|письмо)/.test(t))return['Собрать материалы','Составить план/структуру','Написать черновик','Проверить и отредактировать'];
+  if(/(встреч|совещан|презентац)/.test(t))return['Определить цель и повестку','Подготовить материалы','Пригласить участников','Провести встречу'];
+  if(/(учить|изуч|выуч|курс|урок)/.test(t))return['Найти материалы','Изучить теорию','Попрактиковаться','Закрепить и повторить'];
+  if(/(убор|чист|помыть|постира)/.test(t))return['Подготовить всё необходимое','Сделать основную работу','Навести порядок после'];
+  if(/(приготов|готов|обед|ужин|блюд)/.test(t))return['Выбрать рецепт','Купить продукты','Приготовить','Подать/убрать'];
+  if(/(спорт|трениров|зал|бег)/.test(t))return['Разминка','Основная тренировка','Заминка и растяжка'];
+  if(/(план|заплан|организ)/.test(t))return['Определить цель','Расписать шаги','Назначить сроки','Начать выполнение'];
+  return['Подготовиться: '+text,'Сделать основную часть','Проверить результат'];
+}
+document.getElementById('aiDecompBtn').addEventListener('click',async function(){const title=document.getElementById('fTitle').value.trim();if(!title){toast('⚠️ Введите название','err');return;}this.disabled=true;this.textContent='🤔 Думаю...';const subs=await aiDecompose(title);subs.forEach(txt=>tempSubs.push({id:Date.now()+Math.random(),text:txt,done:false}));renderSubsModal();this.disabled=false;this.textContent='🤖 Разбить на подзадачи (AI)';toast('✅ Добавлено '+subs.length+' подзадач','ok');});
+
+document.getElementById('addBtn').addEventListener('click',openNewTask);
+document.getElementById('quickIn').addEventListener('input',function(){
+  const p=parseNLP(this.value);const pv=document.getElementById('nlpPreview');
+  let chips='';
+  if(p.date)chips+='<span class="nlp-chip">📅 '+p.date+'</span>';
+  if(p.priority==='p1')chips+='<span class="nlp-chip" style="color:var(--red)">🔴 срочно</span>';
+  else if(p.priority==='p2'&&/важно/i.test(this.value))chips+='<span class="nlp-chip" style="color:var(--yel)">🟡 важно</span>';
+  if(p.tag)chips+='<span class="nlp-chip" style="color:var(--a)">#'+esc(p.tag)+'</span>';
+  if(p.repeat!=='none')chips+='<span class="nlp-chip" style="color:var(--a2)">🔁 повтор</span>';
+  if(p.remind)chips+='<span class="nlp-chip">🔔 '+p.remind+'м</span>';
+  pv.innerHTML=chips;pv.style.display=chips?'flex':'none';
+});
+document.getElementById('quickIn').addEventListener('keydown',e=>{if(e.key==='Enter'){const v=e.target.value.trim();if(!v)return;const p=parseNLP(v);S.tasks.unshift({id:Date.now(),text:p.text||v,done:false,priority:p.priority,tag:p.tag,note:'',date:p.date,pid:null,status:'todo',subtasks:[],repeat:p.repeat,doneAt:null,starred:false,estimate:0,remind:p.remind});e.target.value='';document.getElementById('nlpPreview').style.display='none';save();render();toast('✅ Добавлено','ok');scheduleReminders();}});
+
+// POMODORO
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function stopPomTick(){if(pomTick){clearInterval(pomTick);pomTick=null;}pomOn=false;pomBgTime=null;releaseWakeLock();}
+function togglePom(){
+  pomOn=!pomOn;
+  if(pomOn){pomBgTime=Date.now();tryWakeLock();
+    pomTick=setInterval(()=>{
+      if(pomBgTime){const el=Math.round((Date.now()-pomBgTime)/1000);pomBgTime=Date.now();pomSec=Math.max(0,pomSec-el);}
+      const d=document.getElementById('pomDisp');if(d)d.textContent=fmt(pomSec);
+      const total=S.pomMode==='work'?S.pomDur*60:5*60,C=2*Math.PI*65;
+      const p=document.querySelector('.pom-pr');if(p)p.style.strokeDashoffset=C*(pomSec/total);
+      if(pomSec<=0){stopPomTick();playSound();if(S.pomMode==='work'){S.pomSessions++;addXP(XP_POM);if(focusTaskId){const ft=S.tasks.find(t=>t.id===focusTaskId);if(ft)ft.pomCount=(ft.pomCount||0)+1;}S.pomMode='break';pomSec=5*60;notif('🍅 Pomodoro!','Перерыв 5 мин!');toast('🍅 Сессия #'+S.pomSessions+' (+'+XP_POM+'XP)!','ok');}else{S.pomMode='work';pomSec=S.pomDur*60;notif('☕ Перерыв окончен','Время работать!');toast('⚡ Поехали!','ok');}save();render();}
+    },1000);
+  }else{clearInterval(pomTick);pomTick=null;pomBgTime=null;releaseWakeLock();}
+  const btn=document.getElementById('pomPlay');if(btn)btn.textContent=pomOn?'⏸ Пауза':'▶ Старт';
+  document.title=pomOn?'⏱ '+fmt(pomSec)+' — Momentum':'Momentum';
+}
+setInterval(()=>{if(pomOn)document.title='⏱ '+fmt(pomSec)+' — Momentum';},5000);
+function resetPom(){stopPomTick();pomSec=S.pomMode==='work'?S.pomDur*60:5*60;render();document.title='Momentum';}
+function switchPomMode(){stopPomTick();S.pomMode=S.pomMode==='work'?'break':'work';pomSec=S.pomMode==='work'?S.pomDur*60:5*60;save();render();}
+
+// NAV
+function setActiveNav(nav){
+  // highlight the matching bottom-nav button, or "Ещё" if it's a secondary screen
+  const mainTabs=['today','projects','habits','stats'];
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(mainTabs.includes(nav)) b.classList.toggle('active',b.dataset.nav===nav);
+    else b.classList.toggle('active',b.dataset.nav==='more');
+  });
+}
+function syncTabs(tab){setActiveNav(tab);}
+function goTo(dest){
+  if(dest!=='smartlists')smartListOpen=null;
+  try{pushNav(dest);}catch(e){}
+  if(dest!=='pomodoro'){stopPomTick();pomSec=S.pomMode==='work'?S.pomDur*60:5*60;}
+  if(dest==='stats'){curTab='stats';setActiveNav('stats');renderStats();}
+  else if(dest==='calendar'){curTab='calendar';setActiveNav('calendar');renderCalendar();}
+  else{curTab=dest;setActiveNav(dest);render();}
+}
+document.querySelector('.navbar').addEventListener('click',e=>{
+  const btn=e.target.closest('.nav-btn');if(!btn)return;const nav=btn.dataset.nav;
+  if(nav==='more'){openSheet('moreOverlay');return;}
+  goTo(nav);
+});
+document.querySelectorAll('#moreOverlay .more-item').forEach(item=>{
+  item.addEventListener('click',function(){
+    const dest=this.dataset.more;closeSheet('moreOverlay');
+    if(dest==='settings'){syncSettings();updateMemBar();renderTagColors();openSheet('settingsOverlay');return;}
+    goTo(dest);
+  });
+});
+
+
+const ONB_SLIDES=[
+  {ic:'👋',title:'Добро пожаловать!',txt:'Momentum — твой планировщик задач, привычек и целей. Всё в одном месте, без облака и подписок.'},
+  {ic:'⚡',title:'Умный ввод',txt:'Просто пиши обычным языком: «завтра позвонить маме #семья важно». Momentum сам распознает дату, тег, приоритет и повтор. Свайп влево — удалить, долгое нажатие — меню.'},
+  {ic:'🔥',title:'Привычки и Pomodoro',txt:'Отмечай привычки по дням или на весь месяц. Встроенный таймер Pomodoro помогает фокусироваться.'},
+  {ic:'🌱',title:'Цели и аналитика',txt:'Ставь цели по сферам жизни с числовым прогрессом. В «Итогах» — диаграммы и карта активности за год. Остальное — в меню «Ещё».'},
+];
+let onbIdx=0;
+function renderOnbSlide(){
+  const sl=ONB_SLIDES[onbIdx];
+  document.getElementById('onbSlide').innerHTML='<div class="onb-ic">'+sl.ic+'</div><div class="onb-title">'+sl.title+'</div><div class="onb-txt">'+sl.txt+'</div>';
+  document.getElementById('onbDots').innerHTML=ONB_SLIDES.map((_,i)=>'<div class="onb-dot'+(i===onbIdx?' on':'')+'"></div>').join('');
+  document.getElementById('onbNext').textContent=onbIdx===ONB_SLIDES.length-1?'Начать ✨':'Далее →';
+}
+function finishOnb(){S.onboarded=true;save();document.getElementById('onbOverlay').classList.remove('show');}
+function startOnboarding(){onbIdx=0;renderOnbSlide();document.getElementById('onbOverlay').classList.add('show');}
+document.getElementById('onbNext').addEventListener('click',()=>{if(onbIdx<ONB_SLIDES.length-1){onbIdx++;renderOnbSlide();}else finishOnb();});
+document.getElementById('onbSkip').addEventListener('click',finishOnb);
+
+
+// ===== Android back button handling (don't exit app on every back) =====
+let navStack=['today'];
+function pushNav(tab){if(navStack[navStack.length-1]!==tab){navStack.push(tab);history.pushState({tab:tab},'');}}
+window.addEventListener('popstate',function(e){
+  // close any open sheet first
+  const openSheet2=document.querySelector('.overlay.show,.sheet-overlay.show');
+  if(openSheet2){openSheet2.classList.remove('show');history.pushState({tab:curTab},'');return;}
+  // if onboarding open, ignore
+  if(document.getElementById('onbOverlay')?.classList.contains('show'))return;
+  // go back to "today" if elsewhere, else allow exit
+  if(curTab!=='today'){curTab='today';setActiveNav('today');render();history.pushState({tab:'today'},'');}
+});
+// seed history so first back press is captured
+try{history.pushState({tab:'today'},'');}catch(e){}
+
+// ANDROID KEYBOARD FIX
+if(window.visualViewport){
+  let lastH=window.visualViewport.height;
+  window.visualViewport.addEventListener('resize',()=>{
+    document.getElementById('app').style.height=window.visualViewport.height+'px';
+    const active=document.activeElement;
+    if(active&&(active.tagName==='INPUT'||active.tagName==='TEXTAREA')&&window.visualViewport.height<lastH)setTimeout(()=>active.scrollIntoView({block:'center',behavior:'smooth'}),100);
+    lastH=window.visualViewport.height;
+  });
+}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('globalSearchBtn').click();}if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();const qi=document.getElementById('quickIn');if(qi){qi.focus();}}});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();setTimeout(()=>toast('📲 Меню браузера → «На главный экран»'),4000);});
+
+// INIT
+applyTheme();applyAMOLED();applyCompact();applyAccent();checkAutoTheme();setInterval(checkAutoTheme,60000);pomSec=S.pomDur*60;
+function cleanWeekDone(){const cutoff=new Date(NOW);cutoff.setDate(cutoff.getDate()-370);const cs=dateStr(cutoff);for(const k in S.weekDone){if(k<cs)delete S.weekDone[k];}}
+function updateStreakBadge(){const sb=document.getElementById('streakNum');if(sb)sb.textContent=S.streak;}
+handleRecurring();cleanWeekDone();runAutoArchive();save();render();scheduleReminders();
+if(!S.onboarded)setTimeout(startOnboarding,400);
+document.addEventListener('click',()=>{if('Notification'in window&&Notification.permission==='default')Notification.requestPermission().then(p=>{S.notif=p==='granted';save();});},{once:true});
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+</script>
+</body>
+</html>
