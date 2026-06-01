@@ -581,6 +581,7 @@ body.accent-pink{--a:#ff6b9d;--a2:#c44569;--ag:linear-gradient(135deg,#ff6b9d,#c
   <div class="setting-row"><div><div class="setting-name">Память</div></div></div>
   <div class="mem-bar"><div class="mem-fill-bg"><div class="mem-fill" id="memFill"></div></div><div class="mem-txt" id="memTxt">—</div></div>
   <div style="height:6px;"></div>
+  <button class="save-btn" id="saveSettingsBtn" style="margin-bottom:10px;">✓ Готово</button>
   <button class="del-btn" id="clearDataBtn">🗑 Сбросить все данные</button>
 </div></div>
 <script>
@@ -627,8 +628,7 @@ let curTab='today',pomOn=false,pomSec=S.pomDur*60,pomTick=null,pomBgTime=null;
 let selPrio='p2',confirmCb=null,curProjId=null,tempSubs=[],searchDebounce=null,wakeLock=null,longPressTimer=null,focusTaskId=null;
 
 const NOW=new Date();
-if(S.calMonth===null||S.calMonth===undefined)S.calMonth=NOW.getMonth();
-if(!S.calYear)S.calYear=NOW.getFullYear();
+S.calMonth=NOW.getMonth();S.calYear=NOW.getFullYear();S.calSelDate=null;
 
 function save(){try{localStorage.setItem('momentum_v1',JSON.stringify(S));}catch(e){toast('⚠️ Память заполнена!','err');}}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
@@ -794,6 +794,7 @@ document.getElementById('toggleSound').addEventListener('click',function(){S.sou
 document.getElementById('pomDurSelect').addEventListener('change',function(){S.pomDur=+this.value;if(!pomOn)pomSec=S.pomDur*60;save();});
 document.getElementById('archiveDaysSelect').addEventListener('change',function(){S.archiveDays=+this.value;save();});
 document.getElementById('apiKeyField').addEventListener('input',function(){S.apiKey=this.value.trim();save();});
+document.getElementById('saveSettingsBtn').addEventListener('click',()=>{save();closeSheet('settingsOverlay');toast('✓ Настройки сохранены','ok');});
 document.getElementById('clearDataBtn').addEventListener('click',()=>{confirm2('Сбросить всё?','Удалятся все данные.',()=>{localStorage.removeItem('momentum_v1');location.reload();},'Сбросить');});
 function renderTagColors(){const el=document.getElementById('tagColorsList');if(!el)return;const tags=[...new Set(S.tasks.map(t=>t.tag).filter(Boolean))];if(!tags.length){el.innerHTML='<div style="font-size:11px;color:var(--t3);">Тегов пока нет</div>';return;}el.innerHTML=tags.map(t=>'<div style="display:flex;align-items:center;gap:10px;padding:5px 0;"><span style="font-size:12px;flex:1;">'+esc(t)+'</span><input type="color" value="'+(S.tagColors[t]||'#7c6ef7')+'" data-tagcolor="'+esc(t)+'" style="width:30px;height:30px;border:none;background:none;cursor:pointer;"></div>').join('');el.querySelectorAll('[data-tagcolor]').forEach(inp=>inp.addEventListener('input',function(){S.tagColors[this.dataset.tagcolor]=this.value;save();}));}
 function updateMemBar(){
@@ -1052,7 +1053,7 @@ function renderToday(el){
     +'<div class="sort-row"><button class="sort-btn" id="sortBtn">'+(S.sortOrder==='priority'?'🔴 По приоритету':S.sortOrder==='date'?'📅 По дате':'🔤 По имени')+' ▾</button></div>'
     +(S.filter!=='done'&&pending.length?'<div class="sec-lbl">Активные <span class="sec-count">'+pending.length+'</span></div>'+pending.map(taskH).join(''):'')
     +((S.filter==='done'||S.filter==='all')&&done.length?'<div class="sec-lbl">Выполнено <span class="sec-count">'+done.length+'</span></div>'+done.map(taskH).join(''):'')
-    +(all.length===0?'<div class="empty"><div class="empty-ic">'+(!S.searchQuery&&S.filter==='all'?'✨':'🔍')+'</div><div class="empty-tx">'+(!S.searchQuery&&S.filter==='all'?'Пока нет задач':'Ничего не найдено')+'</div>'+(!S.searchQuery&&S.filter==='all'?'<button class="empty-act" id="emptyAddBtn">+ Добавить</button>':'')+'</div>':'')
+    +(all.length===0?'<div class="empty"><div class="empty-ic">'+(!S.searchQuery&&S.filter==='all'?'✨':'🔍')+'</div><div class="empty-tx">'+(S.searchQuery?'Ничего не найдено':S.filter==='all'?'Пока нет задач.<br>Добавь первую внизу 👇':'В этом фильтре пусто.<br>Нажми «Все», чтобы увидеть задачи')+'</div>'+(!S.searchQuery&&S.filter==='all'?'<button class="empty-act" id="emptyAddBtn">+ Добавить</button>':'')+(S.filter!=='all'&&!S.searchQuery?'<button class="empty-act" id="emptyAllBtn">← Показать все</button>':'')+'</div>':'')
     +'<div style="height:12px;"></div>';
 }
 
@@ -1363,6 +1364,7 @@ function bindContentEvents(){
   const aiIn=el.querySelector('#aiIn'),aiGo=el.querySelector('#aiGoBtn');
   if(aiIn&&aiGo){aiGo.addEventListener('click',runAI);aiIn.addEventListener('keydown',e=>{if(e.key==='Enter')runAI();});}
   el.querySelector('#emptyAddBtn')?.addEventListener('click',openNewTask);
+  el.querySelector('#emptyAllBtn')?.addEventListener('click',()=>{S.filter='all';save();render();});
   el.querySelectorAll('[data-mood]').forEach(b=>{b.addEventListener('click',function(){S.moods[todayStr()]=+this.dataset.mood;addXP(2);save();render();toast('Настроение записано 💜','ok');});});
   el.querySelector('#moodReset')?.addEventListener('click',()=>{delete S.moods[todayStr()];save();render();});
   el.querySelectorAll('.hday[data-hid]').forEach(d=>{d.addEventListener('click',function(){const hid=+this.dataset.hid,day=+this.dataset.day,h=S.habits.find(x=>x.id===hid);if(!h)return;const wasOff=!h.days[day];h.days[day]=wasOff?1:0;h.streak=h.days.filter(d=>d).length;if(wasOff)addXP(XP_HABIT);save();render();});});
@@ -1447,10 +1449,20 @@ async function aiDecompose(text){
   if(S.apiKey&&S.apiKey.startsWith('sk-ant')){
     try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})});const dd=await res.json();if(!dd.error){const txt=dd.content.map(b=>b.type==='text'?b.text:'').join('');const arr=JSON.parse(txt.match(/\[[\s\S]*\]/)[0]);return arr.map(x=>typeof x==='string'?x:x.text);}}catch(e){}
   }
-  // local fallback
-  const parts=text.split(/\s+(?:и|,|;)\s+/).filter(x=>x.length>2);
-  if(parts.length>=2)return parts.map(p=>p.trim());
-  return ['Подготовиться к: '+text,'Выполнить основную часть','Проверить результат'];
+  // local fallback — умная разбивка по типу задачи
+  const parts=text.split(/\s+(?:и|,|;)\s+/).map(x=>x.trim()).filter(x=>x.length>2);
+  if(parts.length>=2)return parts;
+  const t=text.toLowerCase();
+  if(/(позвон|звон|связ)/.test(t))return['Найти номер/контакт','Подготовить что сказать','Позвонить','Записать договорённости'];
+  if(/(куп|магазин|заказ)/.test(t))return['Составить список','Сравнить цены','Купить/заказать','Проверить покупку'];
+  if(/(написа|текст|статья|отчёт|отчет|письмо)/.test(t))return['Собрать материалы','Составить план/структуру','Написать черновик','Проверить и отредактировать'];
+  if(/(встреч|совещан|презентац)/.test(t))return['Определить цель и повестку','Подготовить материалы','Пригласить участников','Провести встречу'];
+  if(/(учить|изуч|выуч|курс|урок)/.test(t))return['Найти материалы','Изучить теорию','Попрактиковаться','Закрепить и повторить'];
+  if(/(убор|чист|помыть|постира)/.test(t))return['Подготовить всё необходимое','Сделать основную работу','Навести порядок после'];
+  if(/(приготов|готов|обед|ужин|блюд)/.test(t))return['Выбрать рецепт','Купить продукты','Приготовить','Подать/убрать'];
+  if(/(спорт|трениров|зал|бег)/.test(t))return['Разминка','Основная тренировка','Заминка и растяжка'];
+  if(/(план|заплан|организ)/.test(t))return['Определить цель','Расписать шаги','Назначить сроки','Начать выполнение'];
+  return['Подготовиться: '+text,'Сделать основную часть','Проверить результат'];
 }
 document.getElementById('aiDecompBtn').addEventListener('click',async function(){const title=document.getElementById('fTitle').value.trim();if(!title){toast('⚠️ Введите название','err');return;}this.disabled=true;this.textContent='🤔 Думаю...';const subs=await aiDecompose(title);subs.forEach(txt=>tempSubs.push({id:Date.now()+Math.random(),text:txt,done:false}));renderSubsModal();this.disabled=false;this.textContent='🤖 Разбить на подзадачи (AI)';toast('✅ Добавлено '+subs.length+' подзадач','ok');});
 
@@ -1501,6 +1513,7 @@ function setActiveNav(nav){
 function syncTabs(tab){setActiveNav(tab);}
 function goTo(dest){
   if(dest!=='smartlists')smartListOpen=null;
+  try{pushNav(dest);}catch(e){}
   if(dest!=='pomodoro'){stopPomTick();pomSec=S.pomMode==='work'?S.pomDur*60:5*60;}
   if(dest==='stats'){curTab='stats';setActiveNav('stats');renderStats();}
   else if(dest==='calendar'){curTab='calendar';setActiveNav('calendar');renderCalendar();}
@@ -1537,6 +1550,22 @@ function finishOnb(){S.onboarded=true;save();document.getElementById('onbOverlay
 function startOnboarding(){onbIdx=0;renderOnbSlide();document.getElementById('onbOverlay').classList.add('show');}
 document.getElementById('onbNext').addEventListener('click',()=>{if(onbIdx<ONB_SLIDES.length-1){onbIdx++;renderOnbSlide();}else finishOnb();});
 document.getElementById('onbSkip').addEventListener('click',finishOnb);
+
+
+// ===== Android back button handling (don't exit app on every back) =====
+let navStack=['today'];
+function pushNav(tab){if(navStack[navStack.length-1]!==tab){navStack.push(tab);history.pushState({tab:tab},'');}}
+window.addEventListener('popstate',function(e){
+  // close any open sheet first
+  const openSheet2=document.querySelector('.overlay.show,.sheet-overlay.show');
+  if(openSheet2){openSheet2.classList.remove('show');history.pushState({tab:curTab},'');return;}
+  // if onboarding open, ignore
+  if(document.getElementById('onbOverlay')?.classList.contains('show'))return;
+  // go back to "today" if elsewhere, else allow exit
+  if(curTab!=='today'){curTab='today';setActiveNav('today');render();history.pushState({tab:'today'},'');}
+});
+// seed history so first back press is captured
+try{history.pushState({tab:'today'},'');}catch(e){}
 
 // ANDROID KEYBOARD FIX
 if(window.visualViewport){
