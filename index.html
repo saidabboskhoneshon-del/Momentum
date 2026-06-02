@@ -216,9 +216,9 @@ body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;}
 .cal-nav-btn{width:32px;height:32px;border-radius:50%;background:var(--s2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--t2);}
 .cal-nav-btn:active{background:var(--s3);}
 .cal-month-lbl{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--s1);border-radius:var(--r);padding:10px;border:1px solid var(--b);}
-.cal-dh{text-align:center;font-size:9px;color:var(--t3);font-weight:600;padding:2px 0;}
-.cal-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:11px;cursor:pointer;position:relative;transition:background .12s;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;background:var(--s1);border-radius:var(--r);padding:8px;border:1px solid var(--b);width:100%;box-sizing:border-box;}
+.cal-dh{text-align:center;font-size:10px;color:var(--t3);font-weight:600;padding:2px 0;min-width:0;}
+.cal-d{height:32px;min-width:0;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:12px;cursor:pointer;position:relative;transition:background .12s;}
 .cal-d:active{background:var(--s3);}
 .cal-d.today{background:var(--a);color:#fff;font-weight:700;}
 .cal-d.selected{background:rgba(124,110,247,.25);border:1px solid var(--a);}
@@ -455,11 +455,12 @@ body.accent-pink{--a:#ff6b9d;--a2:#c44569;--ag:linear-gradient(135deg,#ff6b9d,#c
   <div class="field-lbl">Приоритет</div>
   <div class="p-row"><button class="p-btn p1" data-p="p1">🔴 Крит.</button><button class="p-btn p2" data-p="p2">🟡 Важно</button><button class="p-btn p3" data-p="p3">🟢 Обычно</button><button class="p-btn p4" data-p="p4">🔵 Фон</button></div>
   <div class="field-lbl">Тег</div><input class="field" id="fTag" placeholder="работа, дом, здоровье...">
-  <div class="field-lbl">Дедлайн</div><input class="field" type="date" id="fDate">
-  <div class="field-lbl">Оценка времени</div>
+  <div class="field-lbl">Дата выполнения</div><input class="field" type="date" id="fDate">
+  <div class="field-lbl">Время (необязательно)</div><input class="field" type="time" id="fTime">
+  <div class="field-lbl">Сколько займёт (оценка)</div>
   <select class="field" id="fEstimate"><option value="0">Без оценки</option><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="120">2 часа</option><option value="240">4 часа</option><option value="480">8 часов</option></select>
-  <div class="field-lbl">Напомнить за</div>
-  <select class="field" id="fRemind"><option value="0">Без напоминания</option><option value="15">15 минут</option><option value="30">30 минут</option><option value="60">1 час</option><option value="1440">1 день</option></select>
+  <div class="field-lbl">Напомнить заранее</div>
+  <select class="field" id="fRemind"><option value="0">Без напоминания</option><option value="15">за 15 минут</option><option value="30">за 30 минут</option><option value="60">за 1 час</option><option value="1440">за 1 день</option></select>
   <div class="field-lbl">Повтор</div>
   <select class="field" id="fRepeat"><option value="none">Без повтора</option><option value="daily">Каждый день</option><option value="weekly">Каждую неделю</option><option value="workdays">Рабочие дни (Пн–Пт)</option></select>
   <div class="field-lbl">Проект</div><select class="field" id="fProject"></select>
@@ -621,7 +622,7 @@ if(!S.habitView)S.habitView='week';if(!S.achievements)S.achievements={};if(!S.re
 if(!S.accent)S.accent='purple';if(S.amoled===undefined)S.amoled=false;if(S.compact===undefined)S.compact=false;if(S.autoTheme===undefined)S.autoTheme=false;if(!S.tagColors)S.tagColors={};if(!S.templates)S.templates=[];if(!S.selectedTasks)S.selectedTasks=[];if(!S.streak)S.streak=0;if(!S.bestStreak)S.bestStreak=0;if(S.lastActiveDate===undefined)S.lastActiveDate=null;
 if(S.archiveDays===undefined)S.archiveDays=7;if(S.pomDur===undefined)S.pomDur=25;
 if(!S.sortOrder)S.sortOrder='priority';if(S.sound===undefined)S.sound=true;if(!S.apiKey)S.apiKey='';
-S.tasks=S.tasks.map(t=>({subtasks:[],status:'todo',pid:null,date:'',note:'',repeat:'none',doneAt:null,pomCount:0,starred:false,estimate:0,remind:0,...t,pid:t.pid??t.projectId??null}));
+S.tasks=S.tasks.map(t=>({subtasks:[],status:'todo',pid:null,date:'',time:'',note:'',repeat:'none',doneAt:null,pomCount:0,starred:false,estimate:0,remind:0,...t,pid:t.pid??t.projectId??null}));
 S.habits=S.habits.map(h=>({targetDays:[0,1,2,3,4,5,6],monthLog:{},...h}));
 
 let curTab='today',pomOn=false,pomSec=S.pomDur*60,pomTick=null,pomBgTime=null;
@@ -635,8 +636,11 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function todayStr(){return NOW.toISOString().slice(0,10);}
 function renderMD(text){return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');}
 function parseNLP(text){
-  const r={text:text,date:'',repeat:'none',priority:'p2',tag:'',remind:0};
+  const r={text:text,date:'',time:'',repeat:'none',priority:'p2',tag:'',remind:0};
   const days={'пн':1,'вт':2,'ср':3,'чт':4,'пт':5,'сб':6,'вс':0};
+  // time: "в 15:00" / "в 9:30" / "в 14ч"
+  const tm=text.match(/в\s+(\d{1,2})[:.](\d{2})/i)||text.match(/в\s+(\d{1,2})\s*ч/i);
+  if(tm){const hh=String(Math.min(23,parseInt(tm[1]))).padStart(2,'0');const mm=tm[2]?String(Math.min(59,parseInt(tm[2]))).padStart(2,'0'):'00';r.time=hh+':'+mm;r.text=r.text.replace(tm[0],'').trim();}
   // dates
   const dm=[
     {re:/\bсегодня\b/i,fn:()=>todayStr()},
@@ -935,7 +939,7 @@ function taskH(t){
     +'<div class="task-meta">'
     +(t.tag?'<span class="tag '+tc+'" '+tagColor+'>'+esc(t.tag)+'</span>':'')
     +(proj?'<span class="tag tg-blu">📁 '+esc(proj.name)+'</span>':'')
-    +(t.date?'<span class="task-inf">'+(overdue?'🚨':'📅')+' '+t.date+'</span>':'')
+    +(t.date?'<span class="task-inf">'+(overdue?'🚨':'📅')+' '+t.date+(t.time?(' '+t.time):'')+'</span>':'')
     +(t.estimate>0?'<span class="task-est">⏱ '+(t.estimate>=60?(t.estimate/60)+'ч':t.estimate+'м')+'</span>':'')
     +(t.remind>0?'<span class="task-inf">🔔 '+t.remind+'м</span>':'')
     +(subs.length?'<span class="task-inf">✅ '+sDone+'/'+subs.length+'</span>':'')
@@ -1034,7 +1038,7 @@ let notifTimers={};
 function scheduleReminders(){
   Object.values(notifTimers).forEach(t=>clearTimeout(t));notifTimers={};
   if(!S.notif)return;const now=Date.now();
-  S.tasks.forEach(t=>{if(t.done||!t.date||!t.remind)return;const due=new Date(t.date+'T09:00:00');const tt=due.getTime()-t.remind*60000;if(tt>now&&tt-now<86400000*2)notifTimers[t.id]=setTimeout(()=>notif('⏰ '+t.text,'Через '+t.remind+' мин'),tt-now);});
+  S.tasks.forEach(t=>{if(t.done||!t.date||!t.remind)return;const due=new Date(t.date+'T'+(t.time||'09:00')+':00');const tt=due.getTime()-t.remind*60000;if(tt>now&&tt-now<86400000*7)notifTimers[t.id]=setTimeout(()=>notif('⏰ '+t.text,t.time?('В '+t.time):('Через '+t.remind+' мин')),tt-now);});
 }
 
 // ===== BATCH SELECT =====
@@ -1410,8 +1414,8 @@ async function runAI(){
 }
 
 // TASK CRUD
-function openNewTask(){document.getElementById('editId').value='';document.getElementById('taskSheetTitle').textContent='Новая задача';document.getElementById('fTitle').value='';document.getElementById('fNote').value='';document.getElementById('fTag').value='';document.getElementById('fDate').value='';document.getElementById('fRepeat').value='none';document.getElementById('fEstimate').value='0';document.getElementById('fRemind').value='0';document.getElementById('delTaskBtn').style.display='none';populateProjSelect(null);setPrio('p2');tempSubs=[];renderSubsModal();openSheet('taskOverlay');setTimeout(()=>document.getElementById('fTitle').focus(),350);}
-function openEditTask(id){const t=S.tasks.find(x=>x.id===id);if(!t)return;document.getElementById('editId').value=id;document.getElementById('taskSheetTitle').textContent='Редактировать';document.getElementById('fTitle').value=t.text;document.getElementById('fNote').value=t.note||'';document.getElementById('fTag').value=t.tag||'';document.getElementById('fDate').value=t.date||'';document.getElementById('fRepeat').value=t.repeat||'none';document.getElementById('fEstimate').value=t.estimate||0;document.getElementById('fRemind').value=t.remind||0;document.getElementById('delTaskBtn').style.display='';populateProjSelect(t.pid);setPrio(t.priority||'p2');tempSubs=JSON.parse(JSON.stringify(t.subtasks||[]));renderSubsModal();openSheet('taskOverlay');}
+function openNewTask(){document.getElementById('editId').value='';document.getElementById('taskSheetTitle').textContent='Новая задача';document.getElementById('fTitle').value='';document.getElementById('fNote').value='';document.getElementById('fTag').value='';document.getElementById('fDate').value='';document.getElementById('fTime').value='';document.getElementById('fRepeat').value='none';document.getElementById('fEstimate').value='0';document.getElementById('fRemind').value='0';document.getElementById('delTaskBtn').style.display='none';populateProjSelect(null);setPrio('p2');tempSubs=[];renderSubsModal();openSheet('taskOverlay');setTimeout(()=>document.getElementById('fTitle').focus(),350);}
+function openEditTask(id){const t=S.tasks.find(x=>x.id===id);if(!t)return;document.getElementById('editId').value=id;document.getElementById('taskSheetTitle').textContent='Редактировать';document.getElementById('fTitle').value=t.text;document.getElementById('fNote').value=t.note||'';document.getElementById('fTag').value=t.tag||'';document.getElementById('fDate').value=t.date||'';document.getElementById('fTime').value=t.time||'';document.getElementById('fRepeat').value=t.repeat||'none';document.getElementById('fEstimate').value=t.estimate||0;document.getElementById('fRemind').value=t.remind||0;document.getElementById('delTaskBtn').style.display='';populateProjSelect(t.pid);setPrio(t.priority||'p2');tempSubs=JSON.parse(JSON.stringify(t.subtasks||[]));renderSubsModal();openSheet('taskOverlay');}
 function populateProjSelect(selId){document.getElementById('fProject').innerHTML='<option value="">Без проекта</option>'+S.projects.map(p=>'<option value="'+p.id+'"'+(p.id===selId?' selected':'')+'>'+esc(p.name)+'</option>').join('');}
 function setPrio(p){selPrio=p;document.querySelectorAll('.p-btn').forEach(b=>b.classList.toggle('sel',b.dataset.p===p));}
 document.querySelectorAll('.p-btn').forEach(b=>{b.addEventListener('click',function(){setPrio(this.dataset.p);});});
@@ -1425,7 +1429,7 @@ document.getElementById('subIn').addEventListener('keydown',e=>{if(e.key==='Ente
 document.getElementById('saveTaskBtn').addEventListener('click',()=>{
   const title=document.getElementById('fTitle').value.trim();if(!title){toast('⚠️ Введите название','err');return;}
   const eid=document.getElementById('editId').value,pid=document.getElementById('fProject').value;
-  const obj={text:title,priority:selPrio,tag:document.getElementById('fTag').value.trim().replace(/^#/,''),note:document.getElementById('fNote').value.trim(),date:document.getElementById('fDate').value,repeat:document.getElementById('fRepeat').value,estimate:+document.getElementById('fEstimate').value,remind:+document.getElementById('fRemind').value,pid:pid?+pid:null,subtasks:JSON.parse(JSON.stringify(tempSubs))};
+  const obj={text:title,priority:selPrio,tag:document.getElementById('fTag').value.trim().replace(/^#/,''),note:document.getElementById('fNote').value.trim(),date:document.getElementById('fDate').value,time:document.getElementById('fTime').value,repeat:document.getElementById('fRepeat').value,estimate:+document.getElementById('fEstimate').value,remind:+document.getElementById('fRemind').value,pid:pid?+pid:null,subtasks:JSON.parse(JSON.stringify(tempSubs))};
   if(eid){const t=S.tasks.find(x=>x.id===+eid);if(t)Object.assign(t,obj);toast('✏️ Обновлено','ok');}
   else{S.tasks.unshift({id:Date.now(),done:false,status:'todo',doneAt:null,...obj});toast('✅ Добавлено','ok');}
   closeSheet('taskOverlay');save();render();
@@ -1471,6 +1475,7 @@ document.getElementById('quickIn').addEventListener('input',function(){
   const p=parseNLP(this.value);const pv=document.getElementById('nlpPreview');
   let chips='';
   if(p.date)chips+='<span class="nlp-chip">📅 '+p.date+'</span>';
+  if(p.time)chips+='<span class="nlp-chip">🕐 '+p.time+'</span>';
   if(p.priority==='p1')chips+='<span class="nlp-chip" style="color:var(--red)">🔴 срочно</span>';
   else if(p.priority==='p2'&&/важно/i.test(this.value))chips+='<span class="nlp-chip" style="color:var(--yel)">🟡 важно</span>';
   if(p.tag)chips+='<span class="nlp-chip" style="color:var(--a)">#'+esc(p.tag)+'</span>';
@@ -1478,7 +1483,7 @@ document.getElementById('quickIn').addEventListener('input',function(){
   if(p.remind)chips+='<span class="nlp-chip">🔔 '+p.remind+'м</span>';
   pv.innerHTML=chips;pv.style.display=chips?'flex':'none';
 });
-document.getElementById('quickIn').addEventListener('keydown',e=>{if(e.key==='Enter'){const v=e.target.value.trim();if(!v)return;const p=parseNLP(v);S.tasks.unshift({id:Date.now(),text:p.text||v,done:false,priority:p.priority,tag:p.tag,note:'',date:p.date,pid:null,status:'todo',subtasks:[],repeat:p.repeat,doneAt:null,starred:false,estimate:0,remind:p.remind});e.target.value='';document.getElementById('nlpPreview').style.display='none';save();render();toast('✅ Добавлено','ok');scheduleReminders();}});
+document.getElementById('quickIn').addEventListener('keydown',e=>{if(e.key==='Enter'){const v=e.target.value.trim();if(!v)return;const p=parseNLP(v);S.tasks.unshift({id:Date.now(),text:p.text||v,done:false,priority:p.priority,tag:p.tag,note:'',date:p.date,time:p.time||'',pid:null,status:'todo',subtasks:[],repeat:p.repeat,doneAt:null,starred:false,estimate:0,remind:p.remind});e.target.value='';document.getElementById('nlpPreview').style.display='none';save();render();toast('✅ Добавлено','ok');scheduleReminders();}});
 
 // POMODORO
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
